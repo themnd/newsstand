@@ -1,0 +1,39 @@
+<h1>$content.name</h1>
+
+#foreach($name in $catalogs)
+<h2>$name</h2>
+#set($catalog = $catalogInfo.get($name))
+  <ul>
+  #foreach($magazine in $catalog.magazines)
+    <li><b>$magazine.name</b>
+    <ul>
+    #foreach($issue in $magazine.issues)
+      <li>$issue.issueCode ($issue.year) $issue.label $issue.releaseDate
+        <div class="issueLink" data-catalog="$!name" data-issue="$!issue.issueCode">
+          <img src="/newsstandws/issue/$issue.issueCode/cover/600.jpg" >
+        </div>
+      </li>
+    #end
+    </ul>
+    </li>
+  #end
+  </ul>
+#end
+<script>
+function openInNewWindow(url) {
+  var win = window.open(url, '_blank');
+  win.focus();
+}
+$('.issueLink').on('click', function(e) {
+  var div = $(e.currentTarget);
+  var catalog = div.attr('data-catalog');
+  var issue = div.attr('data-issue');
+  $.when(Atex.plugin.newsstand.login(catalog, issue))
+    .then(function(data) {
+      if (console.log) {
+        console.log('got url ' + data);
+      }
+      openInNewWindow(data);
+    });
+});
+</script>

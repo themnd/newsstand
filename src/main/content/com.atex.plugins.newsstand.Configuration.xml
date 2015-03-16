@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template-definition version="1.0" xmlns="http://www.polopoly.com/polopoly/cm/app/xml">
+  <input-template name="com.atex.plugins.newsstand.Configuration" label="com.atex.plugins.newsstand.Configuration">
+    <policy>com.atex.plugins.newsstand.ConfigurationPolicy</policy>
+    <editor>com.polopoly.plugin.OPluginConfigContextPolicyWidget</editor>
+    <viewer>com.polopoly.plugin.OPluginConfigContextPolicyWidget</viewer>
+
+    <type>AppConfig</type>
+
+    <param name="EditState_saveAndInsert">false</param>
+    <param name="EditState_saveAndView">true</param>
+    <param name="EditState_saveAndClose">true</param>
+    <param name="ViewState_insert">false</param>
+
+    <field name="host" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.host">
+    </field>
+    <field name="version" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.version">
+    </field>
+    <field name="wsname" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.wsname">
+    </field>
+    <field name="catalogs" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.catalogs">
+    </field>
+    <field name="platform" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.platform">
+    </field>
+    <field name="type" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.type">
+    </field>
+    <field name="device_id" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.device_id">
+    </field>
+  </input-template>
+</template-definition>

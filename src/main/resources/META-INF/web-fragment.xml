@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<web-fragment metadata-complete="true" version="3.0"
+              xmlns="http://java.sun.com/xml/ns/javaee"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd">
+
+  <name>NewsStand</name>
+
+  <context-param>
+    <param-name>cmservlet_ignore.newsstand-ws</param-name>
+    <param-value>newsstandws</param-value>
+  </context-param>
+
+  <listener>
+    <listener-class>com.atex.plugins.newsstand.servlet.NewsstandContextListener</listener-class>
+  </listener>
+
+  <servlet>
+    <servlet-name>newsstandws</servlet-name>
+    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>com.sun.jersey.config.property.packages</param-name>
+      <param-value>com.atex.plugins.newsstand.ws</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>newsstandws</servlet-name>
+    <url-pattern>/newsstandws/*</url-pattern>
+  </servlet-mapping>
+
+</web-fragment>

@@ -1,0 +1,9 @@
+id:.
+major:appconfig
+inputtemplate:com.atex.plugins.newsstand.Configuration
+securityparent:p.siteengine.Configuration.d
+component:polopoly.Content:name:Newsstand Configuration 2
+component:wsname:value:ViewerplusWS
+component:platform:value:web
+component:type:value:production
+component:device_id:value:polopoly
