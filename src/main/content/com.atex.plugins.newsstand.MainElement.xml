@@ -2,7 +2,7 @@
 <template-definition version="1.0" xmlns="http://www.polopoly.com/polopoly/cm/app/xml">
   <!--This file contains input template definitions -->
   <input-template name="com.atex.plugins.newsstand.MainElement" label="com.atex.plugins.newsstand.MainElement">
-    <policy>com.atex.plugins.map.MapPolicy</policy>
+    <policy>com.atex.plugins.baseline.policy.BaselinePolicy</policy>
     <editor>com.polopoly.cm.app.widget.OTopPolicyWidget</editor>
     <viewer>com.polopoly.cm.app.widget.OTopPolicyWidget</viewer>
 
