@@ -41,7 +41,7 @@ How to integrate into your project
 4. in you common content module specify the plugins configuration:
 
 	```
-	id:.
+	id:plugins.com.atex.plugins.newsstand.Config
 	major:appconfig
 	inputtemplate:com.atex.plugins.newsstand.Configuration
 	securityparent:p.siteengine.Configuration.d
