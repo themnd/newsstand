@@ -5,12 +5,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -25,6 +21,7 @@ import com.atex.plugins.newsstand.catalog.data.Catalog;
 import com.atex.plugins.newsstand.catalog.data.Issue;
 import com.atex.plugins.newsstand.catalog.data.Magazine;
 import com.atex.plugins.newsstand.catalog.data.Publisher;
+import com.atex.plugins.newsstand.util.MD5Util;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -62,27 +59,7 @@ public class CatalogParser {
 
         checkFileExists();
 
-        try (InputStream is = Files.newInputStream(Paths.get(uri.getAbsolutePath()))) {
-            final MessageDigest md = MessageDigest.getInstance("MD5");
-            final DigestInputStream dis = new DigestInputStream(is, md);
-            readStreamFully(dis);
-            final byte[] digest = md.digest();
-            final String value = encodeHex(digest);
-            LOGGER.fine(value);
-            return value;
-        } catch (NoSuchAlgorithmException e) {
-            throw new IOException(e);
-        }
-    }
-
-    private void readStreamFully(final InputStream is) throws IOException {
-        final byte[] buffer = new byte[2048];
-        while (true) {
-            int len = is.read(buffer, 0, buffer.length);
-            if (len < buffer.length) {
-                break;
-            }
-        }
+        return MD5Util.md5(Files.newInputStream(Paths.get(uri.getAbsolutePath())));
     }
 
     List<Magazine> getMagazines() throws IOException {
@@ -120,14 +97,6 @@ public class CatalogParser {
             throw new IOException(e);
 
         }
-    }
-
-    private String encodeHex(final byte[] digest) {
-        final StringBuffer sb = new StringBuffer();
-        for (byte b : digest) {
-            sb.append(String.format("%02x", b & 0xff));
-        }
-        return sb.toString();
     }
 
     private void checkFileExists() throws FileNotFoundException {
