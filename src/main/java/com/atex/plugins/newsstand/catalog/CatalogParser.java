@@ -21,8 +21,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.commons.io.IOUtils;
-
 import com.atex.plugins.newsstand.catalog.data.Catalog;
 import com.atex.plugins.newsstand.catalog.data.Issue;
 import com.atex.plugins.newsstand.catalog.data.Magazine;
@@ -30,7 +28,6 @@ import com.atex.plugins.newsstand.catalog.data.Publisher;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.io.CharStreams;
 
 /**
  * Parse a catalog.
@@ -68,7 +65,7 @@ public class CatalogParser {
         try (InputStream is = Files.newInputStream(Paths.get(uri.getAbsolutePath()))) {
             final MessageDigest md = MessageDigest.getInstance("MD5");
             final DigestInputStream dis = new DigestInputStream(is, md);
-            IOUtils.copy(dis, CharStreams.nullWriter());
+            readStreamFully(dis);
             final byte[] digest = md.digest();
             final String value = encodeHex(digest);
             LOGGER.fine(value);
@@ -78,11 +75,29 @@ public class CatalogParser {
         }
     }
 
+    private void readStreamFully(final InputStream is) throws IOException {
+        final byte[] buffer = new byte[2048];
+        while (true) {
+            int len = is.read(buffer, 0, buffer.length);
+            if (len < buffer.length) {
+                break;
+            }
+        }
+    }
+
     List<Magazine> getMagazines() throws IOException {
 
         LOGGER.fine("Parsing " + uri.getAbsolutePath());
 
         checkFileExists();
+
+        try {
+            // load the sqlite-JDBC driver using the current class loader
+            Class.forName("org.sqlite.JDBC");
+        } catch (ClassNotFoundException e) {
+            LOGGER.log(Level.SEVERE, "Cannot find org.sqlite.JDBC driver: " + e.getMessage(), e);
+            throw new IOException(e);
+        }
 
         // create a database connection
         try (final Connection connection = DriverManager.getConnection(getJDBCURI())) {

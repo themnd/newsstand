@@ -1,6 +1,5 @@
 package com.atex.plugins.newsstand.updater;
 
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,7 +47,7 @@ public class UpdaterThread extends Thread {
             } else {
                 updateCache.release(cacheKey, CACHE_TIMEOUT);
             }
-        } catch (IOException e) {
+        } catch (Throwable e) {
             LOGGER.log(Level.SEVERE, "Error getting catalog '" + catalogName + "': " + e.getMessage(), e);
         }
 
