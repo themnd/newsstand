@@ -143,11 +143,11 @@ public class CatalogParser {
     private void addIssueToPublications(final Statement statement, final Map<String, Publication> publications)
             throws SQLException {
 
-        final ResultSet rs = statement.executeQuery("select id, issue_code, magazine_id, year, label, sku, language," +
-                "published, free, release_date, release_id, release_rank, summary, preview, latest_export " +
-                "from issue " +
-                "where NOT(test) " +
-                "order by release_date DESC");
+        final ResultSet rs = statement.executeQuery("select id, issue_code, magazine_id, year, label, sku, language,"
+                + "published, free, release_date, release_id, release_rank, summary, preview, latest_export "
+                + "from issue "
+                + "where NOT(test) "
+                + "order by release_date DESC");
         while (rs.next()) {
             final String id = Integer.toString(rs.getInt("id"));
             final String magazineId = rs.getString("magazine_id");

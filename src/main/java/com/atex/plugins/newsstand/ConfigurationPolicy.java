@@ -20,6 +20,9 @@ public class ConfigurationPolicy extends BaselinePolicy {
     private static final String VERSION = "version";
     private static final String WSNAME = "wsname";
     private static final String CATALOGS = "catalogs";
+    private static final String NEWSPAPERS = "newspapers";
+    private static final String MAGAZINES = "magazines";
+    private static final String COLLATERALS = "collaterals";
     private static final String PLATFORM = "platform";
     private static final String TYPE = "type";
     private static final String DEVICE_ID = "device_id";
@@ -57,13 +60,34 @@ public class ConfigurationPolicy extends BaselinePolicy {
      * @return a not null String.
      */
     public List<String> getCatalogs() {
-        final String value = Strings.nullToEmpty(getChildValue(CATALOGS, ""));
-        return Lists.newArrayList(
-                Splitter
-                        .on(",")
-                        .omitEmptyStrings()
-                        .trimResults()
-                        .split(value));
+        return getValueList(CATALOGS);
+    }
+
+    /**
+     * Return a list of newspaper codes.
+     *
+     * @return a not null String.
+     */
+    public List<String> getNewspapers() {
+        return getValueList(NEWSPAPERS);
+    }
+
+    /**
+     * Return a list of magazine codes.
+     *
+     * @return a not null String.
+     */
+    public List<String> getMagazines() {
+        return getValueList(MAGAZINES);
+    }
+
+    /**
+     * Return a list of collateral codes.
+     *
+     * @return a not null String.
+     */
+    public List<String> getCollaterals() {
+        return getValueList(COLLATERALS);
     }
 
     /**
@@ -91,6 +115,16 @@ public class ConfigurationPolicy extends BaselinePolicy {
      */
     public String getViewerDeviceID() {
         return Strings.nullToEmpty(getChildValue(DEVICE_ID, ""));
+    }
+
+    private List<String> getValueList(final String name) {
+        final String value = Strings.nullToEmpty(getChildValue(name, ""));
+        return Lists.newArrayList(
+                Splitter
+                        .on(",")
+                        .omitEmptyStrings()
+                        .trimResults()
+                        .split(value));
     }
 
 }

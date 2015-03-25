@@ -2,7 +2,7 @@
 <template-definition version="1.0" xmlns="http://www.polopoly.com/polopoly/cm/app/xml">
   <!--This file contains input template definitions -->
   <input-template name="com.atex.plugins.newsstand.MainElement" label="com.atex.plugins.newsstand.MainElement">
-    <policy>com.atex.plugins.baseline.policy.BaselinePolicy</policy>
+    <policy>com.atex.plugins.newsstand.NewsstandPolicy</policy>
     <editor>com.polopoly.cm.app.widget.OTopPolicyWidget</editor>
     <viewer>com.polopoly.cm.app.widget.OTopPolicyWidget</viewer>
 
@@ -25,6 +25,16 @@
 
     <field name="name" input-template="p.ContentName" label="com.atex.plugins.newsstand.MainElement.name" required="true">
       <param name="inlineHelp">true</param>
+    </field>
+
+    <field name="showNewspapers" input-template="p.Checkbox" label="com.atex.plugins.newsstand.MainElement.showNewspapers">
+      <param name="checked">true</param>
+    </field>
+    <field name="showMagazines" input-template="p.Checkbox" label="com.atex.plugins.newsstand.MainElement.showMagazines">
+      <param name="checked">true</param>
+    </field>
+    <field name="showCollaterals" input-template="p.Checkbox" label="com.atex.plugins.newsstand.MainElement.showCollaterals">
+      <param name="checked">true</param>
     </field>
 
     <output-templates mode="www">

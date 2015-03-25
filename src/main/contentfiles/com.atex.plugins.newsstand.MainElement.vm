@@ -1,11 +1,12 @@
 <h1>$content.name</h1>
-
 #foreach($name in $catalogs)
 <h2>$name</h2>
 #set($catalog = $catalogInfo.get($name))
+  #if ($content.showNewspapers)
+  <h2>NEWPAPERS: $catalog.newspapers.size()</h2>
   <ul>
-  #foreach($publication in $catalog.publications)
-    <li><b>$publication.name</b>
+  #foreach($publication in $catalog.newspapers)
+    <li><b>$publication.name</b> $publication.issues.size();
     <ul>
     #foreach($issue in $publication.issues)
       <li>$issue.issueCode ($issue.year) $issue.label $issue.releaseDate
@@ -18,6 +19,43 @@
     </li>
   #end
   </ul>
+  #end
+  #if ($content.showMagazines)
+  <h2>MAGAZINE: $catalog.magazines.size()</h2>
+  <ul>
+  #foreach($publication in $catalog.magazines)
+    <li><b>$publication.name</b> $publication.issues.size();
+    <ul>
+    #foreach($issue in $publication.issues)
+      <li>$issue.issueCode ($issue.year) $issue.label $issue.releaseDate
+        <div class="issueLink" data-catalog="$!name" data-issue="$!issue.issueCode">
+          <img src="/newsstandws/issue/$issue.issueCode/cover/600.jpg" >
+        </div>
+      </li>
+    #end
+    </ul>
+    </li>
+  #end
+  </ul>
+  #end
+  #if ($content.showCollaterals)
+  <h2>COLLATERAL: $catalog.collaterals.size()</h2>
+  <ul>
+  #foreach($publication in $catalog.collaterals)
+    <li><b>$publication.name</b> $publication.issues.size();
+    <ul>
+    #foreach($issue in $publication.issues)
+      <li>$issue.issueCode ($issue.year) $issue.label $issue.releaseDate
+        <div class="issueLink" data-catalog="$!name" data-issue="$!issue.issueCode">
+          <img src="/newsstandws/issue/$issue.issueCode/cover/600.jpg" >
+        </div>
+      </li>
+    #end
+    </ul>
+    </li>
+  #end
+  </ul>
+  #end
 #end
 <script>
 function openInNewWindow(url) {

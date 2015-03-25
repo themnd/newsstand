@@ -18,13 +18,21 @@
     </field>
     <field name="wsname" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.wsname">
     </field>
-    <field name="catalogs" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.catalogs">
-    </field>
     <field name="platform" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.platform">
     </field>
     <field name="type" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.type">
     </field>
     <field name="device_id" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.device_id">
     </field>
+    <layout name="codes" input-template="p.Group">
+      <field name="catalogs" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.catalogs">
+      </field>
+      <field name="newspapers" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.newspapers">
+      </field>
+      <field name="magazines" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.magazines">
+      </field>
+      <field name="collaterals" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.collaterals">
+      </field>
+    </layout>
   </input-template>
 </template-definition>

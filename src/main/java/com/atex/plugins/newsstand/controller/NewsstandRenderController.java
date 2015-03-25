@@ -7,6 +7,8 @@ import java.util.logging.Logger;
 
 import com.atex.plugins.newsstand.ConfigurationPolicy;
 import com.atex.plugins.newsstand.catalog.data.Catalog;
+import com.atex.plugins.newsstand.catalog.data.Publication;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.polopoly.application.Application;
 import com.polopoly.cache.CacheKey;
@@ -42,11 +44,15 @@ public class NewsstandRenderController extends RenderControllerBase {
 
             final SynchronizedUpdateCache updateCache = getCache(context);
             if (updateCache != null) {
-                final Map<String, Catalog> catalogInfo = Maps.newHashMap();
+                final Map<String, CatalogData> catalogInfo = Maps.newHashMap();
                 for (final String catalogName : catalogs) {
                     try {
                         final Catalog catalog = (Catalog) updateCache.get(getCacheKey(catalogName));
-                        catalogInfo.put(catalogName, catalog);
+                        final CatalogData data = new CatalogData(catalogName, catalog);
+                        data.getNewspapers().addAll(filterPublications(catalog.getPublications(), config.getNewspapers()));
+                        data.getMagazines().addAll(filterPublications(catalog.getPublications(), config.getMagazines()));
+                        data.getCollaterals().addAll(filterPublications(catalog.getPublications(), config.getCollaterals()));
+                        catalogInfo.put(catalogName, data);
                     } catch (Exception e) {
                         LOGGER.severe("Error processing catalog '" + catalogName + "': " + e.getMessage());
                     }
@@ -56,6 +62,22 @@ public class NewsstandRenderController extends RenderControllerBase {
         } catch (CMException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
+    }
+
+    private List<Publication> filterPublications(final List<Publication> publications,
+                                                 final List<String> codes) {
+
+        final List<Publication> results = Lists.newArrayList();
+
+        if (codes != null && codes.size() > 0 && publications.size() > 0) {
+            for (final Publication publication : publications) {
+                if (codes.contains(publication.getId())) {
+                    results.add(publication);
+                }
+            }
+        }
+
+        return results;
     }
 
     private SynchronizedUpdateCache getCache(final ControllerContext context) {
