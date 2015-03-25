@@ -98,16 +98,6 @@ public class ViewerClientTest {
         Assert.assertTrue(url.contains(config.getDeviceId()));
     }
 
-    @Test
-    public void reallCallGetCatalogIssues() throws IOException {
-        final ViewerClient vc = new ViewerClientImpl(getRealConfig(), new HttpClientImpl());
-
-        final Catalog issues = vc.getCatalogIssues("ASAR");
-        Assert.assertNotNull(issues);
-        System.out.println(issues.toString());
-
-    }
-
     /*
     @Test
     public void reallCallLogin() throws IOException {
