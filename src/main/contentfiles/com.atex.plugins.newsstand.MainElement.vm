@@ -4,10 +4,10 @@
 <h2>$name</h2>
 #set($catalog = $catalogInfo.get($name))
   <ul>
-  #foreach($magazine in $catalog.magazines)
-    <li><b>$magazine.name</b>
+  #foreach($publication in $catalog.publications)
+    <li><b>$publication.name</b>
     <ul>
-    #foreach($issue in $magazine.issues)
+    #foreach($issue in $publication.issues)
       <li>$issue.issueCode ($issue.year) $issue.label $issue.releaseDate
         <div class="issueLink" data-catalog="$!name" data-issue="$!issue.issueCode">
           <img src="/newsstandws/issue/$issue.issueCode/cover/600.jpg" >

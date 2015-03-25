@@ -8,9 +8,9 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 
 /**
- * A magazine.
+ * A publication.
  */
-public class Magazine {
+public class Publication {
 
     private final Publisher publisher;
     private final String id;
@@ -26,7 +26,7 @@ public class Magazine {
      * @param name name of the magazine.
      * @param defaultLanguage default language.
      */
-    public Magazine(final Publisher publisher, final String id, final String name, final String defaultLanguage) {
+    public Publication(final Publisher publisher, final String id, final String name, final String defaultLanguage) {
         this.publisher = checkNotNull(publisher);
         this.id = id;
         this.name = name;

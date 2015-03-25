@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.atex.plugins.newsstand.catalog.data.Catalog;
-import com.atex.plugins.newsstand.catalog.data.Magazine;
+import com.atex.plugins.newsstand.catalog.data.Publication;
 import com.atex.plugins.newsstand.util.FileUtils;
 
 /**
@@ -44,12 +44,12 @@ public class CatalogParserTest {
 
     @Test
     public void testGetMagazines() throws IOException {
-        final List<Magazine> magazines = parser.getMagazines();
-        Assert.assertNotNull(magazines);
-        Assert.assertEquals(3, magazines.size());
-        for (final Magazine magazine : magazines) {
-            Assert.assertNotNull(magazine);
-            Assert.assertEquals(1, magazine.getIssues().size());
+        final List<Publication> publications = parser.getPublications();
+        Assert.assertNotNull(publications);
+        Assert.assertEquals(3, publications.size());
+        for (final Publication publication : publications) {
+            Assert.assertNotNull(publication);
+            Assert.assertEquals(1, publication.getIssues().size());
         }
     }
 
@@ -59,8 +59,8 @@ public class CatalogParserTest {
         Assert.assertNotNull(catalog);
         Assert.assertEquals(uri, catalog.getPath());
         Assert.assertEquals(expectedMD5, catalog.getMd5());
-        Assert.assertNotNull(catalog.getMagazines());
-        Assert.assertEquals(3, catalog.getMagazines().size());
+        Assert.assertNotNull(catalog.getPublications());
+        Assert.assertEquals(3, catalog.getPublications().size());
     }
 
 }

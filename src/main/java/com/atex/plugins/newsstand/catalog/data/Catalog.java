@@ -8,13 +8,13 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 
 /**
- * A catalog of magazines.
+ * A catalog of publications.
  */
 public class Catalog {
 
     private String md5 = "";
     private String path = "";
-    private List<Magazine> magazines = Lists.newArrayList();
+    private List<Publication> publications = Lists.newArrayList();
 
     /**
      * Get the md5 of the catalog.
@@ -57,17 +57,17 @@ public class Catalog {
      *
      * @return a not null list.
      */
-    public List<Magazine> getMagazines() {
-        return magazines;
+    public List<Publication> getPublications() {
+        return publications;
     }
 
     /**
      * Set the list of magazines.
      *
-     * @param magazines a not null list.
+     * @param publications a not null list.
      */
-    public void setMagazines(final List<Magazine> magazines) {
-        this.magazines = checkNotNull(magazines);
+    public void setPublications(final List<Publication> publications) {
+        this.publications = checkNotNull(publications);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class Catalog {
         return Objects.toStringHelper(this)
                       .add("md5", md5)
                       .add("path", path)
-                      .add("magazines", magazines.size())
+                      .add("magazines", publications.size())
                       .toString();
     }
 }

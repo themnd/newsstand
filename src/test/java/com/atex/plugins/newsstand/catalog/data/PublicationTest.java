@@ -7,10 +7,10 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * Unit test for {@link com.atex.plugins.newsstand.catalog.data.Magazine}.
+ * Unit test for {@link Publication}.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class MagazineTest {
+public class PublicationTest {
 
     @Test
     public void testGetters() {
@@ -19,7 +19,7 @@ public class MagazineTest {
         final String name = RandomStringUtils.random(10);
         final String lang = RandomStringUtils.random(10);
 
-        final Magazine mag = new Magazine(pub, id, name, lang);
+        final Publication mag = new Publication(pub, id, name, lang);
         Assert.assertEquals(pub, mag.getPublisher());
         Assert.assertEquals(id, mag.getId());
         Assert.assertEquals(name, mag.getName());
@@ -30,14 +30,14 @@ public class MagazineTest {
     @Test(expected = NullPointerException.class)
     public void testNullIssue() {
         final Publisher pub = new Publisher("id", "name");
-        final Magazine mag = new Magazine(pub, "id", "name", "lang");
+        final Publication mag = new Publication(pub, "id", "name", "lang");
         mag.addIssue(null);
     }
 
     @Test
     public void testAddIssues() {
         final Publisher pub = new Publisher("id", "name");
-        final Magazine mag = new Magazine(pub, "id", "name", "lang");
+        final Publication mag = new Publication(pub, "id", "name", "lang");
         mag.addIssue(new Issue());
         mag.addIssue(new Issue());
         mag.addIssue(new Issue());
@@ -50,6 +50,6 @@ public class MagazineTest {
         final String name = RandomStringUtils.random(10);
         final String lang = RandomStringUtils.random(10);
 
-        new Magazine(null, id, name, lang);
+        new Publication(null, id, name, lang);
     }
 }

@@ -32,7 +32,7 @@ import com.atex.plugins.newsstand.ConfigurationPolicy;
 import com.atex.plugins.newsstand.NewsstandRenderController;
 import com.atex.plugins.newsstand.catalog.data.Catalog;
 import com.atex.plugins.newsstand.catalog.data.Issue;
-import com.atex.plugins.newsstand.catalog.data.Magazine;
+import com.atex.plugins.newsstand.catalog.data.Publication;
 import com.atex.plugins.newsstand.client.ViewerClient;
 import com.atex.plugins.newsstand.client.ViewerClientFactory;
 import com.atex.plugins.newsstand.client.data.AuthData;
@@ -184,8 +184,8 @@ public class IssueResource {
             try {
                 final Catalog catalog = (Catalog) updateCache.get(cacheKey);
                 if (catalog != null) {
-                    for (final Magazine magazine : catalog.getMagazines()) {
-                        for (final Issue issue : magazine.getIssues()) {
+                    for (final Publication publication : catalog.getPublications()) {
+                        for (final Issue issue : publication.getIssues()) {
                             if (StringUtil.equalsIgnoreCase(issue.getIssueCode(), issueCode)) {
                                 return issue;
                             }

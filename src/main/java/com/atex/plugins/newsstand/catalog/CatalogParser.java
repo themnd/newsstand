@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 
 import com.atex.plugins.newsstand.catalog.data.Catalog;
 import com.atex.plugins.newsstand.catalog.data.Issue;
-import com.atex.plugins.newsstand.catalog.data.Magazine;
+import com.atex.plugins.newsstand.catalog.data.Publication;
 import com.atex.plugins.newsstand.catalog.data.Publisher;
 import com.atex.plugins.newsstand.util.MD5Util;
 import com.google.common.base.Strings;
@@ -48,7 +48,7 @@ public class CatalogParser {
         final Catalog catalog = new Catalog();
         catalog.setPath(uri.getAbsolutePath());
         catalog.setMd5(md5());
-        catalog.setMagazines(getMagazines());
+        catalog.setPublications(getPublications());
         return catalog;
 
     }
@@ -62,7 +62,7 @@ public class CatalogParser {
         return MD5Util.md5(Files.newInputStream(Paths.get(uri.getAbsolutePath())));
     }
 
-    List<Magazine> getMagazines() throws IOException {
+    List<Publication> getPublications() throws IOException {
 
         LOGGER.fine("Parsing " + uri.getAbsolutePath());
 
@@ -83,8 +83,8 @@ public class CatalogParser {
             statement.setQueryTimeout(QUERY_TIMEOUT);  // set timeout to 30 sec.
 
             final Map<String, Publisher> publishers = getPublishers(statement);
-            final Map<String, Magazine> magazines = getMagazines(statement, publishers);
-            addIssueToMagazines(statement, magazines);
+            final Map<String, Publication> magazines = getPublications(statement, publishers);
+            addIssueToPublications(statement, magazines);
 
             return Lists.newArrayList(magazines.values());
         }
@@ -112,16 +112,16 @@ public class CatalogParser {
             final String id = Strings.nullToEmpty(rs.getString("id"));
             final String name = rs.getString("name");
             final Publisher publisher = new Publisher(id, name);
-            LOGGER.fine(publisher.toString());
+            LOGGER.info(publisher.toString());
             publishers.put(id, publisher);
         }
         return publishers;
     }
 
-    private Map<String, Magazine> getMagazines(final Statement statement, final Map<String, Publisher> publishers)
+    private Map<String, Publication> getPublications(final Statement statement, final Map<String, Publisher> publishers)
             throws SQLException {
 
-        final Map<String, Magazine> magazines = Maps.newHashMap();
+        final Map<String, Publication> magazines = Maps.newHashMap();
         final ResultSet rs = statement.executeQuery("select id, publisher_id, name, default_language from magazine");
         while (rs.next()) {
             final String id = Strings.nullToEmpty(rs.getString("id"));
@@ -133,14 +133,14 @@ public class CatalogParser {
                 LOGGER.severe("magazine " + id + " does not have a valid publisher");
                 continue;
             }
-            final Magazine magazine = new Magazine(publisher, id, name, defLanguage);
-            LOGGER.fine(magazine.toString());
-            magazines.put(id, magazine);
+            final Publication publication = new Publication(publisher, id, name, defLanguage);
+            LOGGER.info(publication.toString());
+            magazines.put(id, publication);
         }
         return magazines;
     }
 
-    private void addIssueToMagazines(final Statement statement, final Map<String, Magazine> magazines)
+    private void addIssueToPublications(final Statement statement, final Map<String, Publication> publications)
             throws SQLException {
 
         final ResultSet rs = statement.executeQuery("select id, issue_code, magazine_id, year, label, sku, language," +
@@ -151,7 +151,7 @@ public class CatalogParser {
         while (rs.next()) {
             final String id = Integer.toString(rs.getInt("id"));
             final String magazineId = rs.getString("magazine_id");
-            final Magazine magazine = magazines.get(magazineId);
+            final Publication publication = publications.get(magazineId);
             if (magazineId == null) {
                 LOGGER.severe("issue " + id + " does not have a valid magazine");
                 continue;
@@ -172,7 +172,7 @@ public class CatalogParser {
             issue.setPreview(rs.getBoolean("preview"));
             issue.setLatestExport(rs.getTimestamp("latest_export"));
             LOGGER.info(issue.toString());
-            magazine.addIssue(issue);
+            publication.addIssue(issue);
         }
     }
 
