@@ -3,7 +3,7 @@ package com.atex.plugins.newsstand.updater;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.atex.plugins.newsstand.NewsstandRenderController;
+import com.atex.plugins.newsstand.controller.NewsstandRenderController;
 import com.atex.plugins.newsstand.catalog.data.Catalog;
 import com.atex.plugins.newsstand.client.ViewerClient;
 import com.atex.plugins.newsstand.client.ViewerClientFactory;

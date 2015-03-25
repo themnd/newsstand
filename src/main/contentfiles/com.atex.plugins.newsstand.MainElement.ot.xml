@@ -20,6 +20,6 @@
         <externalid>p.siteengine.JavaClassRenderController</externalid>
       </contentid>
     </contentref>
-    <component group="output/controller/selected/renderControllerClass" name="value">com.atex.plugins.newsstand.NewsstandRenderController</component>
+    <component group="output/controller/selected/renderControllerClass" name="value">com.atex.plugins.newsstand.controller.NewsstandRenderController</component>
   </content-xml>
 </output-template>

@@ -29,7 +29,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import com.atex.plugins.newsstand.ConfigurationPolicy;
-import com.atex.plugins.newsstand.NewsstandRenderController;
+import com.atex.plugins.newsstand.controller.NewsstandRenderController;
 import com.atex.plugins.newsstand.catalog.data.Catalog;
 import com.atex.plugins.newsstand.catalog.data.Issue;
 import com.atex.plugins.newsstand.catalog.data.Publication;

@@ -1,10 +1,11 @@
-package com.atex.plugins.newsstand;
+package com.atex.plugins.newsstand.controller;
 
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.atex.plugins.newsstand.ConfigurationPolicy;
 import com.atex.plugins.newsstand.catalog.data.Catalog;
 import com.google.common.collect.Maps;
 import com.polopoly.application.Application;
