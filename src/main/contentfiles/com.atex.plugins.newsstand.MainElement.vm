@@ -1,3 +1,27 @@
+#macro(showIssues $publication)
+  <li><b>$publication.name</b> $publication.issues.size();
+  #if ($publication.issues.size() > 0)
+    #set($issue  = $publication.issues.get(0))
+    <div>
+      <i>Latest issue $issue.issueCode ($issue.year) $issue.label $issue.releaseDate</i>
+        <div class="issueLink" data-catalog="$!name" data-issue="$!issue.issueCode">
+          <img src="/newsstandws/issue/$issue.issueCode/cover/360.jpg" >
+        </div>
+    </div>
+    #if ($publication.issues.size() > 1)
+      #foreach($issue in $publication.issues.subList(1, $publication.issues.size()))
+      <div style="float:left;">
+        $issue.issueCode ($issue.year)<br>$issue.label<br>$issue.releaseDate
+        <div class="issueLink" data-catalog="$!name" data-issue="$!issue.issueCode">
+          <img height="175" src="/newsstandws/issue/$issue.issueCode/cover/360.jpg" >
+        </div>
+      </div>
+      #end
+    <br style="clear:both">
+    #end
+  #end
+  </li>
+#end
 <h1>$content.name</h1>
 #foreach($name in $catalogs)
 <h2>$name</h2>
@@ -5,55 +29,25 @@
   #if ($content.showNewspapers)
   <h2>NEWPAPERS: $catalog.newspapers.size()</h2>
   <ul>
-  #foreach($publication in $catalog.newspapers)
-    <li><b>$publication.name</b> $publication.issues.size();
-    <ul>
-    #foreach($issue in $publication.issues)
-      <li>$issue.issueCode ($issue.year) $issue.label $issue.releaseDate
-        <div class="issueLink" data-catalog="$!name" data-issue="$!issue.issueCode">
-          <img src="/newsstandws/issue/$issue.issueCode/cover/600.jpg" >
-        </div>
-      </li>
+    #foreach($publication in $catalog.newspapers)
+      #showIssues($publication)
     #end
-    </ul>
-    </li>
-  #end
   </ul>
   #end
   #if ($content.showMagazines)
   <h2>MAGAZINE: $catalog.magazines.size()</h2>
   <ul>
-  #foreach($publication in $catalog.magazines)
-    <li><b>$publication.name</b> $publication.issues.size();
-    <ul>
-    #foreach($issue in $publication.issues)
-      <li>$issue.issueCode ($issue.year) $issue.label $issue.releaseDate
-        <div class="issueLink" data-catalog="$!name" data-issue="$!issue.issueCode">
-          <img src="/newsstandws/issue/$issue.issueCode/cover/600.jpg" >
-        </div>
-      </li>
+    #foreach($publication in $catalog.magazines)
+      #showIssues($publication)
     #end
-    </ul>
-    </li>
-  #end
   </ul>
   #end
   #if ($content.showCollaterals)
   <h2>COLLATERAL: $catalog.collaterals.size()</h2>
   <ul>
-  #foreach($publication in $catalog.collaterals)
-    <li><b>$publication.name</b> $publication.issues.size();
-    <ul>
-    #foreach($issue in $publication.issues)
-      <li>$issue.issueCode ($issue.year) $issue.label $issue.releaseDate
-        <div class="issueLink" data-catalog="$!name" data-issue="$!issue.issueCode">
-          <img src="/newsstandws/issue/$issue.issueCode/cover/600.jpg" >
-        </div>
-      </li>
+    #foreach($publication in $catalog.collaterals)
+      #showIssues($publication)
     #end
-    </ul>
-    </li>
-  #end
   </ul>
   #end
 #end
