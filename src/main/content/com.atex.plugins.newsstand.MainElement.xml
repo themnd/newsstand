@@ -27,6 +27,9 @@
       <param name="inlineHelp">true</param>
     </field>
 
+    <field name="showCatalogs" input-template="p.TextInput" label="com.atex.plugins.newsstand.MainElement.showCatalogs">
+    </field>
+
     <field name="showNewspapers" input-template="p.Checkbox" label="com.atex.plugins.newsstand.MainElement.showNewspapers">
       <param name="checked">true</param>
     </field>

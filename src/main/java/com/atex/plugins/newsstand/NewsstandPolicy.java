@@ -1,9 +1,13 @@
 package com.atex.plugins.newsstand;
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.atex.plugins.baseline.policy.BaselinePolicy;
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.polopoly.cm.app.policy.CheckboxPolicy;
 import com.polopoly.cm.client.CMException;
 import com.polopoly.model.DescribesModelType;
@@ -16,20 +20,30 @@ public class NewsstandPolicy extends BaselinePolicy {
 
     private static final Logger LOGGER = Logger.getLogger(NewsstandPolicy.class.getName());
 
-    private static final String SHOWNEWSPAPERS = "showNewspapers";
-    private static final String SHOWMAGAZINES = "showMagazines";
-    private static final String SHOWCOLLATERALS = "showCollaterals";
+    private static final String SHOW_CATALOGS = "showCatalogs";
+    private static final String SHOW_NEWSPAPERS = "showNewspapers";
+    private static final String SHOW_MAGAZINES = "showMagazines";
+    private static final String SHOW_COLLATERALS = "showCollaterals";
+
+    /**
+     * Return a list of catalogs.
+     *
+     * @return a not null String.
+     */
+    public List<String> getShowCatalogs() {
+        return getValueList(SHOW_CATALOGS);
+    }
 
     public boolean isShowNewspapers() {
-        return getCheckboxValue(SHOWNEWSPAPERS, true);
+        return getCheckboxValue(SHOW_NEWSPAPERS, true);
     }
 
     public boolean isShowMagazines() {
-        return getCheckboxValue(SHOWMAGAZINES, true);
+        return getCheckboxValue(SHOW_MAGAZINES, true);
     }
 
     public boolean isShowCollaterals() {
-        return getCheckboxValue(SHOWCOLLATERALS, true);
+        return getCheckboxValue(SHOW_COLLATERALS, true);
     }
 
     private boolean getCheckboxValue(final String name, final boolean defaultValue) {
@@ -46,6 +60,16 @@ public class NewsstandPolicy extends BaselinePolicy {
 
     private boolean getCheckboxValue(final String name) {
         return getCheckboxValue(name, false);
+    }
+
+    private List<String> getValueList(final String name) {
+        final String value = Strings.nullToEmpty(getChildValue(name, ""));
+        return Lists.newArrayList(
+                Splitter
+                        .on(",")
+                        .omitEmptyStrings()
+                        .trimResults()
+                        .split(value));
     }
 
 }

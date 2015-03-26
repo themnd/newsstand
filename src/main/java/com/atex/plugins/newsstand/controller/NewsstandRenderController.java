@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.atex.plugins.newsstand.ConfigurationPolicy;
+import com.atex.plugins.newsstand.NewsstandPolicy;
 import com.atex.plugins.newsstand.catalog.data.Catalog;
 import com.atex.plugins.newsstand.catalog.data.Publication;
 import com.google.common.collect.Lists;
@@ -39,7 +40,26 @@ public class NewsstandRenderController extends RenderControllerBase {
 
         try {
             final ConfigurationPolicy config = getConfiguration(context);
-            final List<String> catalogs = config.getCatalogs();
+            final List<String> availableCatalogs = config.getCatalogs();
+            final NewsstandPolicy policy = (NewsstandPolicy) ModelPathUtil.getBean(context.getContentModel());
+            final List<String> showCatalogs = policy.getShowCatalogs();
+
+            final List<String> catalogs = Lists.newArrayList();
+
+            // add only catalogs configured on the element that
+            // are available globally.
+
+            for (final String catalog : showCatalogs) {
+                if (availableCatalogs.contains(catalog)) {
+                    catalogs.add(catalog);
+                } else {
+                    LOGGER.warning("Catalog " + catalog + " has not been configured in the plugin configuration");
+                }
+            }
+            if (catalogs.size() == 0) {
+                catalogs.addAll(availableCatalogs);
+            }
+
             ModelPathUtil.set(m.getLocal(), "catalogs", catalogs);
 
             final SynchronizedUpdateCache updateCache = getCache(context);
