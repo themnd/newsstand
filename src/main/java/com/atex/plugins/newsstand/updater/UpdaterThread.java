@@ -39,18 +39,29 @@ public class UpdaterThread extends Thread {
         try {
             final ViewerClient viewerClient = ViewerClientFactory.getInstance().createClient();
 
-            final Catalog oldCatalog = (Catalog) updateCache.get(cacheKey);
+            final Catalog oldCatalog = getCachedCatalog(cacheKey);
             final Catalog catalog = viewerClient.getCatalogIssues(catalogName);
             if ((oldCatalog == null) || !oldCatalog.getMd5().equals(catalog.getMd5())) {
                 LOGGER.info("put " + catalog + " into cache " + cacheKey.toString());
                 updateCache.put(cacheKey, catalog, CACHE_TIMEOUT);
             } else {
-                updateCache.release(cacheKey, CACHE_TIMEOUT);
+                if (oldCatalog != null) {
+                    updateCache.release(cacheKey, CACHE_TIMEOUT);
+                }
             }
         } catch (Throwable e) {
             LOGGER.log(Level.SEVERE, "Error getting catalog '" + catalogName + "': " + e.getMessage(), e);
         }
 
+    }
+
+    private Catalog getCachedCatalog(final CacheKey cacheKey) {
+        try {
+            return (Catalog) updateCache.get(cacheKey);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "no cache for " + cacheKey + ": " + e.getMessage());
+        }
+        return null;
     }
 
 }
