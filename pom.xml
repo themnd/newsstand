@@ -124,10 +124,14 @@
       <scope>provided</scope>
     </dependency>
 
+    <!--
+      reverting from 3.8.7 to 3.8.6 due to a bug in linux 32 bit:
+      https://bitbucket.org/xerial/sqlite-jdbc/issue/152
+    -->
     <dependency>
       <groupId>org.xerial</groupId>
       <artifactId>sqlite-jdbc</artifactId>
-      <version>3.8.7</version>
+      <version>3.8.6</version>
     </dependency>
 
     <dependency>
