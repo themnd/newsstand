@@ -13,6 +13,10 @@ public class ViewerClientConfiguration {
     private String platform;
     private String type;
     private String deviceId;
+    private int connectionTimeout;
+    private int socketTimeout;
+    private String proxyHost;
+    private int proxyPort;
 
     public String getHost() {
         return host;
@@ -62,6 +66,38 @@ public class ViewerClientConfiguration {
         this.deviceId = deviceId;
     }
 
+    public int getConnectionTimeout() {
+        return connectionTimeout;
+    }
+
+    public void setConnectionTimeout(final int connectionTimeout) {
+        this.connectionTimeout = connectionTimeout;
+    }
+
+    public int getSocketTimeout() {
+        return socketTimeout;
+    }
+
+    public void setSocketTimeout(final int socketTimeout) {
+        this.socketTimeout = socketTimeout;
+    }
+
+    public String getProxyHost() {
+        return proxyHost;
+    }
+
+    public void setProxyHost(final String proxyHost) {
+        this.proxyHost = proxyHost;
+    }
+
+    public int getProxyPort() {
+        return proxyPort;
+    }
+
+    public void setProxyPort(final int proxyPort) {
+        this.proxyPort = proxyPort;
+    }
+
     @Override
     public String toString() {
         return Objects.toStringHelper(this)
@@ -71,6 +107,10 @@ public class ViewerClientConfiguration {
                       .add("platform", platform)
                       .add("type", type)
                       .add("deviceId", deviceId)
+                      .add("connectionTimeout", connectionTimeout)
+                      .add("socketTimeout", socketTimeout)
+                      .add("proxyHost", proxyHost)
+                      .add("proxyPort", proxyPort)
                       .toString();
     }
 }

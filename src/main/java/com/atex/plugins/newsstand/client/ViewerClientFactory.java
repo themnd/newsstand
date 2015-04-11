@@ -14,8 +14,16 @@ public final class ViewerClientFactory {
     }
 
     public ViewerClient createClient() {
-        final HttpClient httpClient = new HttpClientImpl();
-        return new ViewerClientImpl(configuration, httpClient);
+        return new ViewerClientImpl(configuration, createHttpClient());
+    }
+
+    private HttpClient createHttpClient() {
+        final HttpClientImpl httpClient = new HttpClientImpl();
+        httpClient.setConnectionTimeout(configuration.getConnectionTimeout());
+        httpClient.setSocketTimeout(configuration.getSocketTimeout());
+        httpClient.setProxyHost(configuration.getProxyHost());
+        httpClient.setProxyPort(configuration.getProxyPort());
+        return httpClient;
     }
 
     public static void initInstance(final ViewerClientConfiguration configuration) {

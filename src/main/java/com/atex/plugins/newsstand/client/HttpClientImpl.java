@@ -148,7 +148,7 @@ public class HttpClientImpl implements HttpClient {
 
         if (!Strings.isNullOrEmpty(proxyHost)) {
 
-            LOGGER.fine("Setting proxy for translated client " + proxyHost + ":" + proxyPort);
+            LOGGER.fine("Setting proxy for this client " + proxyHost + ":" + proxyPort);
 
             final HttpHost proxy = new HttpHost(proxyHost, proxyPort);
             httpParams.setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);

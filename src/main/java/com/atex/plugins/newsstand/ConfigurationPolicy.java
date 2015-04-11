@@ -1,6 +1,7 @@
 package com.atex.plugins.newsstand;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.atex.plugins.baseline.policy.BaselinePolicy;
 import com.google.common.base.Splitter;
@@ -14,6 +15,8 @@ import com.polopoly.model.DescribesModelType;
 @DescribesModelType
 public class ConfigurationPolicy extends BaselinePolicy {
 
+    private static final Logger LOGGER = Logger.getLogger(ConfigurationPolicy.class.getName());
+
     public static final String CONFIG_EXTERNAL_ID = "plugins.com.atex.plugins.newsstand.Config";
 
     private static final String HOST = "host";
@@ -26,6 +29,14 @@ public class ConfigurationPolicy extends BaselinePolicy {
     private static final String PLATFORM = "platform";
     private static final String TYPE = "type";
     private static final String DEVICE_ID = "device_id";
+    private static final String CONNECTIONTIMEOUT = "connectionTimeout";
+    private static final String SOCKETTIMEOUT = "socketTimeout";
+    private static final String PROXYHOST = "proxyHost";
+    private static final String PROXYPORT = "proxyPort";
+
+    private static final int DEFAULT_CONNECTION_TIMEOUT = 5 * 1000;
+    private static final int DEFAULT_SOCKET_TIMEOUT = 30 * 1000;
+    private static final int DEFAULT_PROXY_PORT = 8080;
 
     /**
      * Return the server host name.
@@ -115,6 +126,54 @@ public class ConfigurationPolicy extends BaselinePolicy {
      */
     public String getViewerDeviceID() {
         return Strings.nullToEmpty(getChildValue(DEVICE_ID, ""));
+    }
+
+    /**
+     * Return the connection timeout for the http client.
+     *
+     * @return a valid integer.
+     */
+    public int getConnectionTimeout() {
+        return getChildIntValue(CONNECTIONTIMEOUT, DEFAULT_CONNECTION_TIMEOUT);
+    }
+
+    /**
+     * Return the socket timeout for the http client.
+     *
+     * @return a valid integer.
+     */
+    public int getSocketTimeout() {
+        return getChildIntValue(SOCKETTIMEOUT, DEFAULT_SOCKET_TIMEOUT);
+    }
+
+    /**
+     * Return the proxy host for the http client.
+     *
+     * @return a not null String.
+     */
+    public String getProxyHost() {
+        return Strings.nullToEmpty(getChildValue(PROXYHOST, ""));
+    }
+
+    /**
+     * Return the proxy port for the http client.
+     *
+     * @return a valid integer.
+     */
+    public int getProxyPort() {
+        return getChildIntValue(PROXYPORT, DEFAULT_PROXY_PORT);
+    }
+
+    private int getChildIntValue(final String name, final int defaultValue) {
+        final String value = getChildValue(name, null);
+        if (!Strings.isNullOrEmpty(value)) {
+            try {
+                return Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+                LOGGER.severe("cannot parse a valid value for " + name + ": " + e.getMessage());
+            }
+        }
+        return defaultValue;
     }
 
     private List<String> getValueList(final String name) {

@@ -12,27 +12,52 @@
     <param name="EditState_saveAndClose">true</param>
     <param name="ViewState_insert">false</param>
 
-    <field name="host" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.host">
-    </field>
-    <field name="version" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.version">
-    </field>
-    <field name="wsname" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.wsname">
-    </field>
-    <field name="platform" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.platform">
-    </field>
-    <field name="type" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.type">
-    </field>
-    <field name="device_id" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.device_id">
-    </field>
-    <layout name="codes" input-template="p.Group">
-      <field name="catalogs" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.catalogs">
-      </field>
-      <field name="newspapers" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.newspapers">
-      </field>
-      <field name="magazines" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.magazines">
-      </field>
-      <field name="collaterals" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.collaterals">
-      </field>
+    <layout name="pages" input-template="p.AjaxPageMenu">
+      <layout name="servicePage" input-template="p.Page" label="com.atex.plugins.newsstand.Configuration.servicePage">
+        <param name="lazyInit">true</param>
+
+        <field name="host" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.host">
+        </field>
+        <field name="version" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.version">
+        </field>
+        <field name="wsname" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.wsname">
+        </field>
+        <field name="platform" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.platform">
+        </field>
+        <field name="type" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.type">
+        </field>
+        <field name="device_id" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.device_id">
+        </field>
+
+      </layout>
+      <layout name="codePage" input-template="p.Page" label="com.atex.plugins.newsstand.Configuration.codePage">
+        <param name="lazyInit">true</param>
+
+        <layout name="codes" input-template="p.Group">
+          <field name="catalogs" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.catalogs">
+          </field>
+          <field name="newspapers" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.newspapers">
+          </field>
+          <field name="magazines" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.magazines">
+          </field>
+          <field name="collaterals" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.collaterals">
+          </field>
+        </layout>
+      </layout>
+
+      <layout name="clientPage" input-template="p.Page" label="com.atex.plugins.newsstand.Configuration.clientPage">
+        <param name="lazyInit">true</param>
+
+        <field name="connectionTimeout" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.connectionTimeout">
+        </field>
+        <field name="socketTimeout" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.socketTimeout">
+        </field>
+        <field name="proxyHost" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.proxyHost">
+        </field>
+        <field name="proxyPort" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.proxyPort">
+        </field>
+      </layout>
+
     </layout>
   </input-template>
 </template-definition>

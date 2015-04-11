@@ -24,6 +24,10 @@ public abstract class ViewerClientConfigurationFactory {
         conf.setPlatform(policy.getViewerPlatform());
         conf.setType(policy.getViewerType());
         conf.setDeviceId(policy.getViewerDeviceID());
+        conf.setConnectionTimeout(policy.getConnectionTimeout());
+        conf.setSocketTimeout(policy.getSocketTimeout());
+        conf.setProxyHost(policy.getProxyHost());
+        conf.setProxyPort(policy.getProxyPort());
         return conf;
     }
 }

@@ -7,3 +7,7 @@ component:wsname:value:ViewerplusWS
 component:platform:value:web
 component:type:value:production
 component:device_id:value:polopoly
+component:connectionTimeout:value:3000
+component:socketTimeout:value:30000
+#component:proxyHost:value:
+#component:proxyPort:value:
