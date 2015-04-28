@@ -9,6 +9,8 @@ import com.atex.plugins.newsstand.ConfigurationPolicy;
 import com.atex.plugins.newsstand.NewsstandPolicy;
 import com.atex.plugins.newsstand.catalog.data.Catalog;
 import com.atex.plugins.newsstand.catalog.data.Publication;
+import com.atex.plugins.newsstand.client.ViewerClient;
+import com.atex.plugins.newsstand.client.ViewerClientFactory;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.polopoly.application.Application;
@@ -32,6 +34,9 @@ import com.polopoly.siteengine.mvc.RenderControllerBase;
 public class NewsstandRenderController extends RenderControllerBase {
 
     private static final Logger LOGGER = Logger.getLogger(NewsstandRenderController.class.getName());
+
+    public static final int CACHE_TIMEOUT = 30 * 60 * 1000;
+    public static final int CACHE_RELEASE_TIMEOUT = 2 * 1000;
 
     @Override
     public void populateModelBeforeCacheKey(final RenderRequest request, final TopModel m, final ControllerContext context) {
@@ -67,11 +72,24 @@ public class NewsstandRenderController extends RenderControllerBase {
                 final Map<String, CatalogData> catalogInfo = Maps.newHashMap();
                 for (final String catalogName : catalogs) {
                     try {
-                        final Catalog catalog = (Catalog) updateCache.get(getCacheKey(catalogName));
+                        final Catalog catalog = getCatalogFromCache(updateCache, catalogName, false);
                         final CatalogData data = new CatalogData(catalogName, catalog);
-                        data.getNewspapers().addAll(filterPublications(catalog.getPublications(), config.getNewspapers()));
-                        data.getMagazines().addAll(filterPublications(catalog.getPublications(), config.getMagazines()));
-                        data.getCollaterals().addAll(filterPublications(catalog.getPublications(), config.getCollaterals()));
+                        if (policy.isShowNewspapers()) {
+                            data.getNewspapers().addAll(
+                                    filterPublications(catalog.getPublications(), config.getNewspapers()));
+                        }
+                        if  (policy.isShowMagazines()) {
+                            data.getMagazines().addAll(
+                                    filterPublications(catalog.getPublications(), config.getMagazines()));
+                        }
+                        if (policy.isShowSeasonals()) {
+                            data.getSeasonals().addAll(
+                                    filterPublications(catalog.getPublications(), config.getSeasonals()));
+                        }
+                        if (policy.isShowSpecials()) {
+                            data.getSpecials().addAll(
+                                    filterPublications(catalog.getPublications(), config.getSpecials()));
+                        }
                         catalogInfo.put(catalogName, data);
                     } catch (Exception e) {
                         LOGGER.severe("Error processing catalog '" + catalogName + "': " + e.getMessage());
@@ -116,6 +134,79 @@ public class NewsstandRenderController extends RenderControllerBase {
         return (ConfigurationPolicy) policyCMServer.getPolicy(
                 new ExternalContentId(ConfigurationPolicy.CONFIG_EXTERNAL_ID));
 
+    }
+
+    /*
+    private Catalog getCatalogFromCache(final SynchronizedUpdateCache updateCache, final String catalogName) {
+
+        final CacheKey cacheKey = getCacheKey(catalogName);
+
+        Catalog catalog = null;
+        try {
+            final ViewerClient viewerClient = ViewerClientFactory.getInstance().createClient();
+
+            catalog = (Catalog) updateCache.get(cacheKey);
+            if (catalog == null) {
+                catalog = viewerClient.getCatalogIssues(catalogName);
+                if (catalog != null) {
+                    updateCache.put(cacheKey, catalog, CACHE_TIMEOUT);
+                }
+            }
+        } catch (Throwable e) {
+            LOGGER.log(Level.SEVERE, "Error getting catalog '" + catalogName + "': " + e.getMessage(), e);
+        } finally {
+
+            // if we did not find any way we should release
+            // the write lock.
+
+            if (catalog == null) {
+               updateCache.release(cacheKey, CACHE_RELEASE_TIMEOUT);
+           }
+        }
+
+        return catalog;
+    }
+    */
+    public static Catalog getCatalogFromCache(final SynchronizedUpdateCache updateCache,
+                                              final String catalogName,
+                                              final boolean checkUpdates) {
+
+        final CacheKey cacheKey = getCacheKey(catalogName);
+
+        Catalog catalog = null;
+        try {
+            final ViewerClient viewerClient = ViewerClientFactory.getInstance().createClient();
+
+            catalog = (Catalog) updateCache.get(cacheKey);
+            if (catalog == null) {
+                catalog = viewerClient.getCatalogIssues(catalogName);
+                if (catalog != null) {
+                    LOGGER.info("put " + catalog + " into cache " + cacheKey.toString());
+                    updateCache.put(cacheKey, catalog, CACHE_TIMEOUT);
+                }
+            } else if (checkUpdates) {
+                final Catalog newCatalog = viewerClient.getCatalogIssues(catalogName);
+                if (newCatalog != null) {
+                    if (!catalog.getMd5().equals(catalog.getMd5())) {
+                        LOGGER.info("put " + catalog + " into cache " + cacheKey.toString());
+                        updateCache.put(cacheKey, newCatalog, CACHE_TIMEOUT);
+                        catalog = newCatalog;
+                    }
+                }
+            }
+        } catch (Throwable e) {
+            LOGGER.log(Level.SEVERE, "Error getting catalog '" + catalogName + "': " + e.getMessage(), e);
+        } finally {
+
+            // if we did not find any way we should release
+            // the write lock.
+
+            if (catalog == null) {
+                updateCache.release(cacheKey, CACHE_RELEASE_TIMEOUT);
+            }
+        }
+
+        return catalog;
     }
 
     public static CacheKey getCacheKey(final String catalogName) {

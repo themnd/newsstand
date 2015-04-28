@@ -112,7 +112,7 @@ public class CatalogParser {
             final String id = Strings.nullToEmpty(rs.getString("id"));
             final String name = rs.getString("name");
             final Publisher publisher = new Publisher(id, name);
-            LOGGER.info(publisher.toString());
+            LOGGER.fine(publisher.toString());
             publishers.put(id, publisher);
         }
         return publishers;
@@ -134,7 +134,7 @@ public class CatalogParser {
                 continue;
             }
             final Publication publication = new Publication(publisher, id, name, defLanguage);
-            LOGGER.info(publication.toString());
+            LOGGER.fine(publication.toString());
             magazines.put(id, publication);
         }
         return magazines;
@@ -143,8 +143,9 @@ public class CatalogParser {
     private void addIssueToPublications(final Statement statement, final Map<String, Publication> publications)
             throws SQLException {
 
-        final ResultSet rs = statement.executeQuery("select id, issue_code, magazine_id, year, label, sku, language,"
-                + "published, free, release_date, release_id, release_rank, summary, preview, latest_export "
+        final ResultSet rs = statement.executeQuery("select id, issue_code, magazine_id, year, label, teaser, "
+                + "sku, language, published, free, release_date, release_id, release_rank, summary, preview, "
+                + "latest_export "
                 + "from issue "
                 + "where NOT(test) "
                 + "order by release_date DESC");
@@ -161,6 +162,7 @@ public class CatalogParser {
             issue.setIssueCode(Strings.nullToEmpty(rs.getString("issue_code")));
             issue.setYear(rs.getString("year"));
             issue.setLabel(rs.getString("label"));
+            issue.setTeaser(rs.getString("teaser"));
             issue.setSku(rs.getString("sku"));
             issue.setLanguage(rs.getString("language"));
             issue.setPublished(rs.getBoolean("published"));
@@ -171,7 +173,7 @@ public class CatalogParser {
             issue.setSummary(rs.getBoolean("summary"));
             issue.setPreview(rs.getBoolean("preview"));
             issue.setLatestExport(rs.getTimestamp("latest_export"));
-            LOGGER.info(issue.toString());
+            LOGGER.fine(issue.toString());
             publication.addIssue(issue);
         }
     }

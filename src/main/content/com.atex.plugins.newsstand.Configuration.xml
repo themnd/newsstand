@@ -40,7 +40,9 @@
           </field>
           <field name="magazines" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.magazines">
           </field>
-          <field name="collaterals" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.collaterals">
+          <field name="seasonals" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.seasonals">
+          </field>
+          <field name="specials" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.specials">
           </field>
         </layout>
       </layout>

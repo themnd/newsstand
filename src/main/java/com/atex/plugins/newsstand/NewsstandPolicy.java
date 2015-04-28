@@ -23,7 +23,8 @@ public class NewsstandPolicy extends BaselinePolicy {
     private static final String SHOW_CATALOGS = "showCatalogs";
     private static final String SHOW_NEWSPAPERS = "showNewspapers";
     private static final String SHOW_MAGAZINES = "showMagazines";
-    private static final String SHOW_COLLATERALS = "showCollaterals";
+    private static final String SHOW_SEASONALS = "showSeasonals";
+    private static final String SHOW_SPECIALS = "showSpecials";
 
     /**
      * Return a list of catalogs.
@@ -42,8 +43,12 @@ public class NewsstandPolicy extends BaselinePolicy {
         return getCheckboxValue(SHOW_MAGAZINES, true);
     }
 
-    public boolean isShowCollaterals() {
-        return getCheckboxValue(SHOW_COLLATERALS, true);
+    public boolean isShowSeasonals() {
+        return getCheckboxValue(SHOW_SEASONALS, true);
+    }
+
+    public boolean isShowSpecials() {
+        return getCheckboxValue(SHOW_SPECIALS, true);
     }
 
     private boolean getCheckboxValue(final String name, final boolean defaultValue) {

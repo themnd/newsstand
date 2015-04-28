@@ -16,6 +16,7 @@ public class Issue {
     private String issueCode;
     private String year;
     private String label;
+    private String teaser;
     private String sku;
     private String language;
     private boolean published;
@@ -57,6 +58,14 @@ public class Issue {
 
     public void setLabel(final String label) {
         this.label = label;
+    }
+
+    public String getTeaser() {
+        return teaser;
+    }
+
+    public void setTeaser(final String teaser) {
+        this.teaser = teaser;
     }
 
     public String getSku() {

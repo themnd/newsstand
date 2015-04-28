@@ -18,7 +18,8 @@ public class CatalogData {
 
     private List<Publication> newspapers = Lists.newArrayList();
     private List<Publication> magazines = Lists.newArrayList();
-    private List<Publication> collaterals = Lists.newArrayList();
+    private List<Publication> seasonals = Lists.newArrayList();
+    private List<Publication> specials = Lists.newArrayList();
 
     public CatalogData(final String code, final Catalog catalog) {
         this.code = code;
@@ -45,8 +46,12 @@ public class CatalogData {
         return magazines;
     }
 
-    public List<Publication> getCollaterals() {
-        return collaterals;
+    public List<Publication> getSeasonals() {
+        return seasonals;
+    }
+
+    public List<Publication> getSpecials() {
+        return specials;
     }
 
 }

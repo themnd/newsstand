@@ -42,10 +42,18 @@
     #end
   </ul>
   #end
-  #if ($content.showCollaterals)
-  <h2>COLLATERAL: $catalog.collaterals.size()</h2>
+  #if ($content.showSeasonals)
+  <h2>COLLATERAL: $catalog.seasonals.size()</h2>
   <ul>
-    #foreach($publication in $catalog.collaterals)
+    #foreach($publication in $catalog.seasonals)
+      #showIssues($publication)
+    #end
+  </ul>
+  #end
+  #if ($content.showSpecials)
+  <h2>COLLATERAL: $catalog.specials.size()</h2>
+  <ul>
+    #foreach($publication in $catalog.specials)
       #showIssues($publication)
     #end
   </ul>

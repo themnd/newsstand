@@ -1,13 +1,8 @@
 package com.atex.plugins.newsstand.updater;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.atex.plugins.newsstand.controller.NewsstandRenderController;
-import com.atex.plugins.newsstand.catalog.data.Catalog;
-import com.atex.plugins.newsstand.client.ViewerClient;
-import com.atex.plugins.newsstand.client.ViewerClientFactory;
-import com.polopoly.cache.CacheKey;
 import com.polopoly.cache.SynchronizedUpdateCache;
 
 /**
@@ -16,8 +11,6 @@ import com.polopoly.cache.SynchronizedUpdateCache;
 public class UpdaterThread extends Thread {
 
     private static final Logger LOGGER = Logger.getLogger(UpdaterThread.class.getName());
-
-    public static final int CACHE_TIMEOUT = 30 * 60 * 1000;
 
     private final SynchronizedUpdateCache updateCache;
     private final String catalogName;
@@ -33,35 +26,7 @@ public class UpdaterThread extends Thread {
 
     @Override
     public void run() {
-
-        final CacheKey cacheKey = NewsstandRenderController.getCacheKey(catalogName);
-
-        try {
-            final ViewerClient viewerClient = ViewerClientFactory.getInstance().createClient();
-
-            final Catalog oldCatalog = getCachedCatalog(cacheKey);
-            final Catalog catalog = viewerClient.getCatalogIssues(catalogName);
-            if ((oldCatalog == null) || !oldCatalog.getMd5().equals(catalog.getMd5())) {
-                LOGGER.info("put " + catalog + " into cache " + cacheKey.toString());
-                updateCache.put(cacheKey, catalog, CACHE_TIMEOUT);
-            } else {
-                if (oldCatalog != null) {
-                    updateCache.release(cacheKey, CACHE_TIMEOUT);
-                }
-            }
-        } catch (Throwable e) {
-            LOGGER.log(Level.SEVERE, "Error getting catalog '" + catalogName + "': " + e.getMessage(), e);
-        }
-
-    }
-
-    private Catalog getCachedCatalog(final CacheKey cacheKey) {
-        try {
-            return (Catalog) updateCache.get(cacheKey);
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "no cache for " + cacheKey + ": " + e.getMessage());
-        }
-        return null;
+        NewsstandRenderController.getCatalogFromCache(updateCache, catalogName, true);
     }
 
 }

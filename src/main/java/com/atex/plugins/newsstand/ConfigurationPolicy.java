@@ -25,7 +25,8 @@ public class ConfigurationPolicy extends BaselinePolicy {
     private static final String CATALOGS = "catalogs";
     private static final String NEWSPAPERS = "newspapers";
     private static final String MAGAZINES = "magazines";
-    private static final String COLLATERALS = "collaterals";
+    private static final String SEASONALS = "seasonals";
+    private static final String SPECIALS = "specials";
     private static final String PLATFORM = "platform";
     private static final String TYPE = "type";
     private static final String DEVICE_ID = "device_id";
@@ -93,12 +94,21 @@ public class ConfigurationPolicy extends BaselinePolicy {
     }
 
     /**
-     * Return a list of collateral codes.
+     * Return a list of seasonals codes.
      *
      * @return a not null String.
      */
-    public List<String> getCollaterals() {
-        return getValueList(COLLATERALS);
+    public List<String> getSeasonals() {
+        return getValueList(SEASONALS);
+    }
+
+    /**
+     * Return a list of specials codes.
+     *
+     * @return a not null String.
+     */
+    public List<String> getSpecials() {
+        return getValueList(SPECIALS);
     }
 
     /**

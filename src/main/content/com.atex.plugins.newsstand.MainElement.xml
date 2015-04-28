@@ -36,7 +36,10 @@
     <field name="showMagazines" input-template="p.Checkbox" label="com.atex.plugins.newsstand.MainElement.showMagazines">
       <param name="checked">true</param>
     </field>
-    <field name="showCollaterals" input-template="p.Checkbox" label="com.atex.plugins.newsstand.MainElement.showCollaterals">
+    <field name="showSeasonals" input-template="p.Checkbox" label="com.atex.plugins.newsstand.MainElement.showSeasonals">
+      <param name="checked">true</param>
+    </field>
+    <field name="showSpecials" input-template="p.Checkbox" label="com.atex.plugins.newsstand.MainElement.showSpecials">
       <param name="checked">true</param>
     </field>
 
