@@ -1,14 +1,17 @@
 package com.atex.plugins.newsstand.catalog.data;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.google.common.base.Objects;
 
 /**
  * A publisher.
  */
+@XmlRootElement
 public class Publisher {
 
-    private final String id;
-    private final String name;
+    private String id;
+    private String name;
 
     /**
      * Constructor.
@@ -19,6 +22,9 @@ public class Publisher {
     public Publisher(final String id, final String name) {
         this.id = id;
         this.name = name;
+    }
+
+    public Publisher() {
     }
 
     /**
@@ -37,6 +43,14 @@ public class Publisher {
      */
     public String getName() {
         return name;
+    }
+
+    public void setId(final String id) {
+        this.id = id;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
     }
 
     @Override

@@ -4,12 +4,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 
 /**
  * A catalog of publications.
  */
+@XmlRootElement
 public class Catalog {
 
     private String md5 = "";

@@ -4,18 +4,21 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 
 /**
  * A publication.
  */
+@XmlRootElement
 public class Publication {
 
-    private final Publisher publisher;
-    private final String id;
-    private final String name;
-    private final String defaultLanguage;
+    private Publisher publisher;
+    private String id;
+    private String name;
+    private String defaultLanguage;
     private List<Issue> issues = Lists.newArrayList();
 
     /**
@@ -31,6 +34,9 @@ public class Publication {
         this.id = id;
         this.name = name;
         this.defaultLanguage = defaultLanguage;
+    }
+
+    public Publication() {
     }
 
     /**
@@ -85,6 +91,26 @@ public class Publication {
      */
     public void addIssue(final Issue issue) {
         issues.add(checkNotNull(issue));
+    }
+
+    public void setPublisher(final Publisher publisher) {
+        this.publisher = publisher;
+    }
+
+    public void setId(final String id) {
+        this.id = id;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public void setDefaultLanguage(final String defaultLanguage) {
+        this.defaultLanguage = defaultLanguage;
+    }
+
+    public void setIssues(final List<Issue> issues) {
+        this.issues = issues;
     }
 
     @Override
