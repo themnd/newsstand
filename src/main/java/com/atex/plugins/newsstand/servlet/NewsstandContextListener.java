@@ -78,7 +78,7 @@ public class NewsstandContextListener implements javax.servlet.ServletContextLis
         for (final String catalogName : catalogs) {
             scheduler.scheduleAtFixedRate(
                     new UpdaterThread(updateCache, catalogName),
-                    0, 60, TimeUnit.MINUTES);
+                    0, 10, TimeUnit.MINUTES);
         }
     }
 

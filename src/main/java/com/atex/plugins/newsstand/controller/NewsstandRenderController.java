@@ -136,37 +136,6 @@ public class NewsstandRenderController extends RenderControllerBase {
 
     }
 
-    /*
-    private Catalog getCatalogFromCache(final SynchronizedUpdateCache updateCache, final String catalogName) {
-
-        final CacheKey cacheKey = getCacheKey(catalogName);
-
-        Catalog catalog = null;
-        try {
-            final ViewerClient viewerClient = ViewerClientFactory.getInstance().createClient();
-
-            catalog = (Catalog) updateCache.get(cacheKey);
-            if (catalog == null) {
-                catalog = viewerClient.getCatalogIssues(catalogName);
-                if (catalog != null) {
-                    updateCache.put(cacheKey, catalog, CACHE_TIMEOUT);
-                }
-            }
-        } catch (Throwable e) {
-            LOGGER.log(Level.SEVERE, "Error getting catalog '" + catalogName + "': " + e.getMessage(), e);
-        } finally {
-
-            // if we did not find any way we should release
-            // the write lock.
-
-            if (catalog == null) {
-               updateCache.release(cacheKey, CACHE_RELEASE_TIMEOUT);
-           }
-        }
-
-        return catalog;
-    }
-    */
     public static Catalog getCatalogFromCache(final SynchronizedUpdateCache updateCache,
                                               final String catalogName,
                                               final boolean checkUpdates) {
@@ -175,17 +144,16 @@ public class NewsstandRenderController extends RenderControllerBase {
 
         Catalog catalog = null;
         try {
-            final ViewerClient viewerClient = ViewerClientFactory.getInstance().createClient();
 
             catalog = (Catalog) updateCache.get(cacheKey);
             if (catalog == null) {
-                catalog = viewerClient.getCatalogIssues(catalogName);
+                catalog = createClient().getCatalogIssues(catalogName);
                 if (catalog != null) {
                     LOGGER.info("put " + catalog + " into cache " + cacheKey.toString());
                     updateCache.put(cacheKey, catalog, CACHE_TIMEOUT);
                 }
             } else if (checkUpdates) {
-                final Catalog newCatalog = viewerClient.getCatalogIssues(catalogName);
+                final Catalog newCatalog = createClient().getCatalogIssues(catalogName);
                 if (newCatalog != null) {
                     if (!catalog.getMd5().equals(catalog.getMd5())) {
                         LOGGER.info("put " + catalog + " into cache " + cacheKey.toString());
@@ -202,11 +170,16 @@ public class NewsstandRenderController extends RenderControllerBase {
             // the write lock.
 
             if (catalog == null) {
+                LOGGER.info("release " + catalog + " from cache " + cacheKey.toString());
                 updateCache.release(cacheKey, CACHE_RELEASE_TIMEOUT);
             }
         }
 
         return catalog;
+    }
+
+    private static ViewerClient createClient() {
+        return ViewerClientFactory.getInstance().createClient();
     }
 
     public static CacheKey getCacheKey(final String catalogName) {
