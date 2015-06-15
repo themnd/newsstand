@@ -183,13 +183,19 @@ public class IssueResource {
             final CacheKey cacheKey = NewsstandRenderController.getCacheKey(catalogName);
             try {
                 final Catalog catalog = (Catalog) updateCache.get(cacheKey);
-                if (catalog != null) {
-                    for (final Publication publication : catalog.getPublications()) {
-                        for (final Issue issue : publication.getIssues()) {
-                            if (StringUtil.equalsIgnoreCase(issue.getIssueCode(), issueCode)) {
-                                return issue;
+                try {
+                    if (catalog != null) {
+                        for (final Publication publication : catalog.getPublications()) {
+                            for (final Issue issue : publication.getIssues()) {
+                                if (StringUtil.equalsIgnoreCase(issue.getIssueCode(), issueCode)) {
+                                    return issue;
+                                }
                             }
                         }
+                    }
+                } finally {
+                    if (catalog == null) {
+                        updateCache.release(cacheKey, NewsstandRenderController.CACHE_RELEASE_TIMEOUT);
                     }
                 }
             } catch (Exception e) {

@@ -93,8 +93,9 @@ public class PublicationResource {
     private Publication getPublicationFromCatalog(final String catalogName, final String id) {
         if (updateCache != null) {
             final CacheKey cacheKey = NewsstandRenderController.getCacheKey(catalogName);
+            Catalog catalog = null;
             try {
-                final Catalog catalog = (Catalog) updateCache.get(cacheKey);
+                catalog = (Catalog) updateCache.get(cacheKey);
                 if (catalog != null) {
                     for (final Publication publication : catalog.getPublications()) {
                         if (publication.getId().equals(id)) {
@@ -104,6 +105,10 @@ public class PublicationResource {
                 }
             } catch (Exception e) {
                 LOGGER.severe("Cannot get catalog '" + catalogName + "': " + e.getMessage());
+            } finally {
+                if (catalog == null) {
+                    updateCache.release(cacheKey, NewsstandRenderController.CACHE_RELEASE_TIMEOUT);
+                }
             }
         }
         return null;

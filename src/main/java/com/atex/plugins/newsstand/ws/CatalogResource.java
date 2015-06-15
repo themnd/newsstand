@@ -60,10 +60,16 @@ public class CatalogResource {
             final List<String> catalogs = configuration.getCatalogs();
             if (updateCache != null) {
                 final CacheKey cacheKey = NewsstandRenderController.getCacheKey(catalogName);
+                Catalog catalog = null;
                 try {
-                    return (Catalog) updateCache.get(cacheKey);
+                    catalog = (Catalog) updateCache.get(cacheKey);
+                    return catalog;
                 } catch (Exception e) {
                     LOGGER.severe("Cannot get catalog '" + catalogName + "': " + e.getMessage());
+                } finally {
+                    if (catalog == null) {
+                        updateCache.release(cacheKey, NewsstandRenderController.CACHE_RELEASE_TIMEOUT);
+                    }
                 }
             }
         } catch (CMException e) {
