@@ -8,6 +8,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -16,7 +17,10 @@ import javax.ws.rs.core.Response.Status;
 
 import com.atex.plugins.newsstand.ConfigurationPolicy;
 import com.atex.plugins.newsstand.catalog.data.Catalog;
+import com.atex.plugins.newsstand.catalog.data.Issue;
+import com.atex.plugins.newsstand.catalog.data.Publication;
 import com.atex.plugins.newsstand.controller.NewsstandRenderController;
+import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.polopoly.cache.CacheKey;
 import com.polopoly.cache.SynchronizedUpdateCache;
@@ -52,6 +56,46 @@ public class CatalogResource {
         } else {
             return Response.ok(catalog).cacheControl(doCache(MAX_AGE_5_MINUTES)).build();
         }
+    }
+
+    @GET
+    @Path("/publication")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response getPublicationDetail(@PathParam("name") final String name,
+                                         @QueryParam("issueId") final String issueId,
+                                         @QueryParam("issueCode") final String issueCode) {
+
+        final boolean useIssueId = !Strings.isNullOrEmpty(issueId);
+        final boolean useIssueCode = !Strings.isNullOrEmpty(issueCode);
+        if (useIssueId || useIssueCode) {
+            final Catalog catalog = getCatalog(name);
+            if (catalog != null) {
+                if (catalog.getPublications() != null) {
+                    for (final Publication publication : catalog.getPublications()) {
+                        if (publication.getIssues() != null) {
+                            for (final Issue issue : publication.getIssues()) {
+                                if (useIssueId) {
+                                    if (issue.getId().equals(issueId)) {
+                                        return Response.ok(publication)
+                                                       .cacheControl(doCache(MAX_AGE_5_MINUTES))
+                                                       .build();
+                                    }
+                                }
+                                if (useIssueCode) {
+                                    if (issue.getIssueCode().equals(issueCode)) {
+                                        return Response.ok(publication)
+                                                       .cacheControl(doCache(MAX_AGE_5_MINUTES))
+                                                       .build();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return Response.status(Status.NOT_FOUND).cacheControl(noCache()).build();
     }
 
     private Catalog getCatalog(final String catalogName) {
