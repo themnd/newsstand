@@ -20,6 +20,7 @@ import com.atex.plugins.newsstand.catalog.data.Catalog;
 import com.atex.plugins.newsstand.catalog.data.Issue;
 import com.atex.plugins.newsstand.catalog.data.Publication;
 import com.atex.plugins.newsstand.controller.NewsstandRenderController;
+import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.polopoly.cache.CacheKey;
@@ -63,10 +64,12 @@ public class CatalogResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public Response getPublicationDetail(@PathParam("name") final String name,
                                          @QueryParam("issueId") final String issueId,
-                                         @QueryParam("issueCode") final String issueCode) {
+                                         @QueryParam("issueCode") final String issueCode,
+                                         @QueryParam("includeIssues") final Boolean includeIssuesParam) {
 
         final boolean useIssueId = !Strings.isNullOrEmpty(issueId);
         final boolean useIssueCode = !Strings.isNullOrEmpty(issueCode);
+        final boolean includeIssues = Optional.fromNullable(includeIssuesParam).or(true);
         if (useIssueId || useIssueCode) {
             final Catalog catalog = getCatalog(name);
             if (catalog != null) {
@@ -76,16 +79,28 @@ public class CatalogResource {
                             for (final Issue issue : publication.getIssues()) {
                                 if (useIssueId) {
                                     if (issue.getId().equals(issueId)) {
-                                        return Response.ok(publication)
-                                                       .cacheControl(doCache(MAX_AGE_5_MINUTES))
-                                                       .build();
+                                        if (includeIssues) {
+                                            return Response.ok(publication)
+                                                           .cacheControl(doCache(MAX_AGE_5_MINUTES))
+                                                           .build();
+                                        } else {
+                                            return Response.ok(clonePublicationWithoutIssues(publication))
+                                                           .cacheControl(doCache(MAX_AGE_5_MINUTES))
+                                                           .build();
+                                        }
                                     }
                                 }
                                 if (useIssueCode) {
                                     if (issue.getIssueCode().equals(issueCode)) {
-                                        return Response.ok(publication)
-                                                       .cacheControl(doCache(MAX_AGE_5_MINUTES))
-                                                       .build();
+                                        if (includeIssues) {
+                                            return Response.ok(publication)
+                                                           .cacheControl(doCache(MAX_AGE_5_MINUTES))
+                                                           .build();
+                                        } else {
+                                            return Response.ok(clonePublicationWithoutIssues(publication))
+                                                           .cacheControl(doCache(MAX_AGE_5_MINUTES))
+                                                           .build();
+                                        }
                                     }
                                 }
                             }
@@ -96,6 +111,46 @@ public class CatalogResource {
         }
 
         return Response.status(Status.NOT_FOUND).cacheControl(noCache()).build();
+    }
+
+    @GET
+    @Path("/last-newspaper")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response getLastNewspaperIssue(@PathParam("name") final String name) {
+
+        final Catalog catalog = getCatalog(name);
+        if (catalog != null) {
+            if (catalog.getPublications() != null) {
+                try {
+                    final ConfigurationPolicy configurationPolicy = getConfigurationPolicy();
+                    final List<String> newspaperCodes = configurationPolicy.getNewspapers();
+                    for (final Publication publication : catalog.getPublications()) {
+                        if (newspaperCodes.contains(publication.getId())) {
+                            final List<Issue> issues = publication.getIssues();
+                            if (issues.size() > 0) {
+                                return Response.ok(issues.get(0))
+                                               .cacheControl(doCache(MAX_AGE_5_MINUTES))
+                                               .build();
+                            }
+
+                        }
+                    }
+                } catch (CMException e) {
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                }
+            }
+        }
+
+        return Response.status(Status.NOT_FOUND).cacheControl(noCache()).build();
+    }
+
+    private Publication clonePublicationWithoutIssues(final Publication publication) {
+        return new Publication(
+                publication.getPublisher(),
+                publication.getId(),
+                publication.getName(),
+                publication.getDefaultLanguage()
+        );
     }
 
     private Catalog getCatalog(final String catalogName) {
