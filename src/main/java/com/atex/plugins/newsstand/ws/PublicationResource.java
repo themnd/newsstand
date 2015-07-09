@@ -19,10 +19,7 @@ import com.atex.plugins.newsstand.ConfigurationPolicy;
 import com.atex.plugins.newsstand.catalog.data.Catalog;
 import com.atex.plugins.newsstand.catalog.data.Issue;
 import com.atex.plugins.newsstand.catalog.data.Publication;
-import com.atex.plugins.newsstand.controller.NewsstandRenderController;
-import com.google.gson.Gson;
-import com.polopoly.cache.CacheKey;
-import com.polopoly.cache.SynchronizedUpdateCache;
+import com.atex.plugins.newsstand.util.CatalogUtil;
 import com.polopoly.cm.ExternalContentId;
 import com.polopoly.cm.client.CMException;
 import com.polopoly.cm.client.CmClient;
@@ -41,10 +38,7 @@ public class PublicationResource {
     @Context
     private CmClient cmClient;
 
-    @Context
-    private SynchronizedUpdateCache updateCache;
-
-    private Gson gson = new Gson();
+    private final CatalogUtil catalogUtil = CatalogUtil.getInstance();
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
@@ -73,17 +67,14 @@ public class PublicationResource {
         try {
             final ConfigurationPolicy configuration = getConfigurationPolicy();
             final List<String> catalogs = configuration.getCatalogs();
-            if (updateCache != null) {
-                for (final String catalogName : catalogs) {
-                    final Publication publication = getPublicationFromCatalog(catalogName, id);
-                    if (publication != null) {
-                        return publication;
-                    }
+            for (final String catalogName : catalogs) {
+                final Publication publication = getPublicationFromCatalog(catalogName, id);
+                if (publication != null) {
+                    return publication;
                 }
-
-                LOGGER.warning("Cannot find issue " + id);
-
             }
+
+            LOGGER.warning("Cannot find issue " + id);
         } catch (CMException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -91,25 +82,17 @@ public class PublicationResource {
     }
 
     private Publication getPublicationFromCatalog(final String catalogName, final String id) {
-        if (updateCache != null) {
-            final CacheKey cacheKey = NewsstandRenderController.getCacheKey(catalogName);
-            Catalog catalog = null;
-            try {
-                catalog = (Catalog) updateCache.get(cacheKey);
-                if (catalog != null) {
-                    for (final Publication publication : catalog.getPublications()) {
-                        if (publication.getId().equals(id)) {
-                            return publication;
-                        }
+        try {
+            final Catalog catalog = catalogUtil.getCatalog(catalogName);
+            if (catalog != null) {
+                for (final Publication publication : catalog.getPublications()) {
+                    if (publication.getId().equals(id)) {
+                        return publication;
                     }
                 }
-            } catch (Exception e) {
-                LOGGER.severe("Cannot get catalog '" + catalogName + "': " + e.getMessage());
-            } finally {
-                if (catalog == null) {
-                    updateCache.release(cacheKey, NewsstandRenderController.CACHE_RELEASE_TIMEOUT);
-                }
             }
+        } catch (Exception e) {
+            LOGGER.severe("Cannot get catalog '" + catalogName + "': " + e.getMessage());
         }
         return null;
     }

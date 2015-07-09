@@ -1,13 +1,13 @@
 package com.atex.plugins.newsstand.util;
 
+import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.atex.plugins.newsstand.catalog.data.Catalog;
 import com.atex.plugins.newsstand.catalog.data.Issue;
 import com.atex.plugins.newsstand.catalog.data.Publication;
-import com.atex.plugins.newsstand.controller.NewsstandRenderController;
-import com.polopoly.cache.CacheKey;
-import com.polopoly.cache.SynchronizedUpdateCache;
+import com.google.common.collect.Maps;
 import com.polopoly.util.StringUtil;
 
 /**
@@ -19,55 +19,42 @@ public class CatalogUtil {
 
     private static final Logger LOGGER = Logger.getLogger(CatalogUtil.class.getName());
 
-    private final SynchronizedUpdateCache updateCache;
+    private static final CatalogUtil INSTANCE = new CatalogUtil();
 
-    public CatalogUtil(final SynchronizedUpdateCache updateCache) {
-        this.updateCache = updateCache;
+    private Map<String, Catalog> catalogMap = Maps.newConcurrentMap();
+
+    private CatalogUtil() {
+    }
+
+    public static CatalogUtil getInstance() {
+        return INSTANCE;
     }
 
     public Catalog getCatalog(final String catalogName) {
-        if (updateCache != null) {
-            final CacheKey cacheKey = NewsstandRenderController.getCacheKey(catalogName);
-            Catalog catalog = null;
-            try {
-                catalog = (Catalog) updateCache.get(cacheKey);
-                return catalog;
-            } catch (Exception e) {
-                LOGGER.severe("Cannot get catalog '" + catalogName + "': " + e.getMessage());
-            } finally {
-                if (catalog == null) {
-                    updateCache.release(cacheKey, NewsstandRenderController.CACHE_RELEASE_TIMEOUT);
-                }
-            }
+        final Catalog catalog = catalogMap.get(catalogName);
+        if (catalog == null) {
+            LOGGER.log(Level.FINE, "catalog " + catalogName + " not found");
         }
-        return null;
+        return catalog;
     }
 
     public Issue getIssueFromCatalog(final String catalogName, final String issueCode) {
-        if (updateCache != null) {
-            final CacheKey cacheKey = NewsstandRenderController.getCacheKey(catalogName);
-            try {
-                final Catalog catalog = (Catalog) updateCache.get(cacheKey);
-                try {
-                    if (catalog != null) {
-                        for (final Publication publication : catalog.getPublications()) {
-                            for (final Issue issue : publication.getIssues()) {
-                                if (StringUtil.equalsIgnoreCase(issue.getIssueCode(), issueCode)) {
-                                    return issue;
-                                }
-                            }
-                        }
-                    }
-                } finally {
-                    if (catalog == null) {
-                        updateCache.release(cacheKey, NewsstandRenderController.CACHE_RELEASE_TIMEOUT);
+        final Catalog catalog = getCatalog(catalogName);
+        if (catalog != null) {
+            for (final Publication publication : catalog.getPublications()) {
+                for (final Issue issue : publication.getIssues()) {
+                    if (StringUtil.equalsIgnoreCase(issue.getIssueCode(), issueCode)) {
+                        return issue;
                     }
                 }
-            } catch (Exception e) {
-                LOGGER.severe("Cannot get catalog '" + catalogName + "': " + e.getMessage());
             }
+            LOGGER.log(Level.FINE, "Issue " + issueCode + " in catalog " + catalogName + " not found");
         }
         return null;
     }
 
+    public void putCatalog(final String catalogName, final Catalog catalog) {
+        LOGGER.info("put " + catalog + " into cache " + catalogName);
+        catalogMap.put(catalogName, catalog);
+    }
 }

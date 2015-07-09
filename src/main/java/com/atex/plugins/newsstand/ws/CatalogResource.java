@@ -19,12 +19,9 @@ import com.atex.plugins.newsstand.ConfigurationPolicy;
 import com.atex.plugins.newsstand.catalog.data.Catalog;
 import com.atex.plugins.newsstand.catalog.data.Issue;
 import com.atex.plugins.newsstand.catalog.data.Publication;
-import com.atex.plugins.newsstand.controller.NewsstandRenderController;
+import com.atex.plugins.newsstand.util.CatalogUtil;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
-import com.google.gson.Gson;
-import com.polopoly.cache.CacheKey;
-import com.polopoly.cache.SynchronizedUpdateCache;
 import com.polopoly.cm.ExternalContentId;
 import com.polopoly.cm.client.CMException;
 import com.polopoly.cm.client.CmClient;
@@ -43,15 +40,12 @@ public class CatalogResource {
     @Context
     private CmClient cmClient;
 
-    @Context
-    private SynchronizedUpdateCache updateCache;
-
-    private Gson gson = new Gson();
+    private final CatalogUtil catalogUtil = CatalogUtil.getInstance();
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
     public Response getCatalogDetail(@PathParam("name") final String name) {
-        final Catalog catalog = getCatalog(name);
+        final Catalog catalog = catalogUtil.getCatalog(name);
         if (catalog == null) {
             return Response.status(Status.NOT_FOUND).cacheControl(noCache()).build();
         } else {
@@ -71,7 +65,7 @@ public class CatalogResource {
         final boolean useIssueCode = !Strings.isNullOrEmpty(issueCode);
         final boolean includeIssues = Optional.fromNullable(includeIssuesParam).or(true);
         if (useIssueId || useIssueCode) {
-            final Catalog catalog = getCatalog(name);
+            final Catalog catalog = catalogUtil.getCatalog(name);
             if (catalog != null) {
                 if (catalog.getPublications() != null) {
                     for (final Publication publication : catalog.getPublications()) {
@@ -118,7 +112,7 @@ public class CatalogResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public Response getLastNewspaperIssue(@PathParam("name") final String name) {
 
-        final Catalog catalog = getCatalog(name);
+        final Catalog catalog = catalogUtil.getCatalog(name);
         if (catalog != null) {
             if (catalog.getPublications() != null) {
                 try {
@@ -151,30 +145,6 @@ public class CatalogResource {
                 publication.getName(),
                 publication.getDefaultLanguage()
         );
-    }
-
-    private Catalog getCatalog(final String catalogName) {
-        try {
-            final ConfigurationPolicy configuration = getConfigurationPolicy();
-            final List<String> catalogs = configuration.getCatalogs();
-            if (updateCache != null) {
-                final CacheKey cacheKey = NewsstandRenderController.getCacheKey(catalogName);
-                Catalog catalog = null;
-                try {
-                    catalog = (Catalog) updateCache.get(cacheKey);
-                    return catalog;
-                } catch (Exception e) {
-                    LOGGER.severe("Cannot get catalog '" + catalogName + "': " + e.getMessage());
-                } finally {
-                    if (catalog == null) {
-                        updateCache.release(cacheKey, NewsstandRenderController.CACHE_RELEASE_TIMEOUT);
-                    }
-                }
-            }
-        } catch (CMException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return null;
     }
 
     private CacheControl noCache() {

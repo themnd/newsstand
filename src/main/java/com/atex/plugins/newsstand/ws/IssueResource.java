@@ -29,16 +29,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import com.atex.plugins.newsstand.ConfigurationPolicy;
-import com.atex.plugins.newsstand.controller.NewsstandRenderController;
 import com.atex.plugins.newsstand.catalog.data.Catalog;
 import com.atex.plugins.newsstand.catalog.data.Issue;
 import com.atex.plugins.newsstand.catalog.data.Publication;
 import com.atex.plugins.newsstand.client.ViewerClient;
 import com.atex.plugins.newsstand.client.ViewerClientFactory;
 import com.atex.plugins.newsstand.client.data.AuthData;
-import com.google.gson.Gson;
-import com.polopoly.cache.CacheKey;
-import com.polopoly.cache.SynchronizedUpdateCache;
+import com.atex.plugins.newsstand.util.CatalogUtil;
 import com.polopoly.cm.ExternalContentId;
 import com.polopoly.cm.client.CMException;
 import com.polopoly.cm.client.CmClient;
@@ -60,10 +57,7 @@ public class IssueResource {
     @Context
     private CmClient cmClient;
 
-    @Context
-    private SynchronizedUpdateCache updateCache;
-
-    private Gson gson = new Gson();
+    private final CatalogUtil catalogUtil = CatalogUtil.getInstance();
 
     private File cacheLocation = new File(new File(getNewsstandCacheDir()), ISSUES_CACHE_DIR);
 
@@ -158,16 +152,14 @@ public class IssueResource {
 
             final ConfigurationPolicy configuration = getConfigurationPolicy();
             final List<String> catalogs = configuration.getCatalogs();
-            if (updateCache != null) {
-                for (final String name : catalogs) {
-                    if (StringUtil.equals(name, catalogName)) {
-                        return true;
-                    }
+            for (final String name : catalogs) {
+                if (StringUtil.equals(name, catalogName)) {
+                    return true;
                 }
-
-                LOGGER.warning("Cannot find catalog " + catalogName);
-
             }
+
+            LOGGER.warning("Cannot find catalog " + catalogName);
+
         } catch (CMException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -179,27 +171,14 @@ public class IssueResource {
     }
 
     private Issue getIssueFromCatalog(final String catalogName, final String issueCode) {
-        if (updateCache != null) {
-            final CacheKey cacheKey = NewsstandRenderController.getCacheKey(catalogName);
-            try {
-                final Catalog catalog = (Catalog) updateCache.get(cacheKey);
-                try {
-                    if (catalog != null) {
-                        for (final Publication publication : catalog.getPublications()) {
-                            for (final Issue issue : publication.getIssues()) {
-                                if (StringUtil.equalsIgnoreCase(issue.getIssueCode(), issueCode)) {
-                                    return issue;
-                                }
-                            }
-                        }
-                    }
-                } finally {
-                    if (catalog == null) {
-                        updateCache.release(cacheKey, NewsstandRenderController.CACHE_RELEASE_TIMEOUT);
+        final Catalog catalog = catalogUtil.getCatalog(catalogName);
+        if (catalog != null) {
+            for (final Publication publication : catalog.getPublications()) {
+                for (final Issue issue : publication.getIssues()) {
+                    if (StringUtil.equalsIgnoreCase(issue.getIssueCode(), issueCode)) {
+                        return issue;
                     }
                 }
-            } catch (Exception e) {
-                LOGGER.severe("Cannot get catalog '" + catalogName + "': " + e.getMessage());
             }
         }
         return null;
@@ -209,17 +188,14 @@ public class IssueResource {
         try {
             final ConfigurationPolicy configuration = getConfigurationPolicy();
             final List<String> catalogs = configuration.getCatalogs();
-            if (updateCache != null) {
-                for (final String catalogName : catalogs) {
-                    final Issue issue = getIssueFromCatalog(catalogName, issueCode);
-                    if (issue != null) {
-                        return issue;
-                    }
+            for (final String catalogName : catalogs) {
+                final Issue issue = getIssueFromCatalog(catalogName, issueCode);
+                if (issue != null) {
+                    return issue;
                 }
-
-                LOGGER.warning("Cannot find issue " + issueCode);
-
             }
+
+            LOGGER.warning("Cannot find issue " + issueCode);
         } catch (CMException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }

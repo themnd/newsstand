@@ -11,10 +11,10 @@ import com.atex.plugins.newsstand.catalog.data.Catalog;
 import com.atex.plugins.newsstand.catalog.data.Publication;
 import com.atex.plugins.newsstand.client.ViewerClient;
 import com.atex.plugins.newsstand.client.ViewerClientFactory;
+import com.atex.plugins.newsstand.util.CatalogUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.polopoly.application.Application;
-import com.polopoly.cache.CacheKey;
 import com.polopoly.cache.LRUSynchronizedUpdateCache;
 import com.polopoly.cache.SynchronizedUpdateCache;
 import com.polopoly.cm.ExternalContentId;
@@ -140,39 +140,26 @@ public class NewsstandRenderController extends RenderControllerBase {
                                               final String catalogName,
                                               final boolean checkUpdates) {
 
-        final CacheKey cacheKey = getCacheKey(catalogName);
-
         Catalog catalog = null;
         try {
-
-            catalog = (Catalog) updateCache.get(cacheKey);
+            final CatalogUtil catalogUtil = CatalogUtil.getInstance();
+            catalog = catalogUtil.getCatalog(catalogName);
             if (catalog == null) {
                 catalog = createClient().getCatalogIssues(catalogName);
                 if (catalog != null) {
-                    LOGGER.info("put " + catalog + " into cache " + cacheKey.toString());
-                    updateCache.put(cacheKey, catalog, CACHE_TIMEOUT);
+                    catalogUtil.putCatalog(catalogName, catalog);
                 }
             } else if (checkUpdates) {
                 final Catalog newCatalog = createClient().getCatalogIssues(catalogName);
                 if (newCatalog != null) {
                     if (!catalog.getMd5().equals(catalog.getMd5())) {
-                        LOGGER.info("put " + catalog + " into cache " + cacheKey.toString());
-                        updateCache.put(cacheKey, newCatalog, CACHE_TIMEOUT);
+                        catalogUtil.putCatalog(catalogName, catalog);
                         catalog = newCatalog;
                     }
                 }
             }
         } catch (Throwable e) {
             LOGGER.log(Level.SEVERE, "Error getting catalog '" + catalogName + "': " + e.getMessage(), e);
-        } finally {
-
-            // if we did not find any way we should release
-            // the write lock.
-
-            if (catalog == null) {
-                LOGGER.info("release " + catalog + " from cache " + cacheKey.toString());
-                updateCache.release(cacheKey, CACHE_RELEASE_TIMEOUT);
-            }
         }
 
         return catalog;
@@ -180,10 +167,6 @@ public class NewsstandRenderController extends RenderControllerBase {
 
     private static ViewerClient createClient() {
         return ViewerClientFactory.getInstance().createClient();
-    }
-
-    public static CacheKey getCacheKey(final String catalogName) {
-        return new CacheKey(NewsstandRenderController.class, "catalog." + catalogName);
     }
 
 }
