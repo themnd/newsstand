@@ -153,7 +153,7 @@ public class NewsstandRenderController extends RenderControllerBase {
                 final Catalog newCatalog = createClient().getCatalogIssues(catalogName);
                 if (newCatalog != null) {
                     if (!catalog.getMd5().equals(catalog.getMd5())) {
-                        catalogUtil.putCatalog(catalogName, catalog);
+                        catalogUtil.putCatalog(catalogName, newCatalog);
                         catalog = newCatalog;
                     }
                 }
