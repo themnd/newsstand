@@ -18,8 +18,6 @@ import com.atex.plugins.newsstand.updater.UpdaterThread;
 import com.polopoly.application.Application;
 import com.polopoly.application.servlet.ApplicationNameNotFoundException;
 import com.polopoly.application.servlet.ApplicationServletUtil;
-import com.polopoly.cache.LRUSynchronizedUpdateCache;
-import com.polopoly.cache.SynchronizedUpdateCache;
 import com.polopoly.cm.ExternalContentId;
 import com.polopoly.cm.client.CMException;
 import com.polopoly.cm.client.CmClient;
@@ -71,13 +69,10 @@ public class NewsstandContextListener implements javax.servlet.ServletContextLis
 
         final List<String> catalogs = configurationPolicy.getCatalogs();
 
-        final SynchronizedUpdateCache updateCache = (SynchronizedUpdateCache) application
-                .getApplicationComponent(LRUSynchronizedUpdateCache.DEFAULT_COMPOUND_NAME);
-
         scheduler = Executors.newScheduledThreadPool(1);
         for (final String catalogName : catalogs) {
             scheduler.scheduleAtFixedRate(
-                    new UpdaterThread(updateCache, catalogName),
+                    new UpdaterThread(catalogName),
                     0, 1, TimeUnit.HOURS);
         }
     }

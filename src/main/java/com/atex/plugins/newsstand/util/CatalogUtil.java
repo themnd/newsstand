@@ -57,4 +57,9 @@ public class CatalogUtil {
         LOGGER.info("put " + catalog + " into cache " + catalogName);
         catalogMap.put(catalogName, catalog);
     }
+
+    public void clear() {
+        LOGGER.info("clear all the caches");
+        catalogMap.clear();
+    }
 }

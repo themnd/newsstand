@@ -67,36 +67,33 @@ public class NewsstandRenderController extends RenderControllerBase {
 
             ModelPathUtil.set(m.getLocal(), "catalogs", catalogs);
 
-            final SynchronizedUpdateCache updateCache = getCache(context);
-            if (updateCache != null) {
-                final Map<String, CatalogData> catalogInfo = Maps.newHashMap();
-                for (final String catalogName : catalogs) {
-                    try {
-                        final Catalog catalog = getCatalogFromCache(updateCache, catalogName, false);
-                        final CatalogData data = new CatalogData(catalogName, catalog);
-                        if (policy.isShowNewspapers()) {
-                            data.getNewspapers().addAll(
-                                    filterPublications(catalog.getPublications(), config.getNewspapers()));
-                        }
-                        if  (policy.isShowMagazines()) {
-                            data.getMagazines().addAll(
-                                    filterPublications(catalog.getPublications(), config.getMagazines()));
-                        }
-                        if (policy.isShowSeasonals()) {
-                            data.getSeasonals().addAll(
-                                    filterPublications(catalog.getPublications(), config.getSeasonals()));
-                        }
-                        if (policy.isShowSpecials()) {
-                            data.getSpecials().addAll(
-                                    filterPublications(catalog.getPublications(), config.getSpecials()));
-                        }
-                        catalogInfo.put(catalogName, data);
-                    } catch (Exception e) {
-                        LOGGER.severe("Error processing catalog '" + catalogName + "': " + e.getMessage());
+            final Map<String, CatalogData> catalogInfo = Maps.newHashMap();
+            for (final String catalogName : catalogs) {
+                try {
+                    final Catalog catalog = getCatalogFromCache(catalogName, false);
+                    final CatalogData data = new CatalogData(catalogName, catalog);
+                    if (policy.isShowNewspapers()) {
+                        data.getNewspapers().addAll(
+                                filterPublications(catalog.getPublications(), config.getNewspapers()));
                     }
+                    if  (policy.isShowMagazines()) {
+                        data.getMagazines().addAll(
+                                filterPublications(catalog.getPublications(), config.getMagazines()));
+                    }
+                    if (policy.isShowSeasonals()) {
+                        data.getSeasonals().addAll(
+                                filterPublications(catalog.getPublications(), config.getSeasonals()));
+                    }
+                    if (policy.isShowSpecials()) {
+                        data.getSpecials().addAll(
+                                filterPublications(catalog.getPublications(), config.getSpecials()));
+                    }
+                    catalogInfo.put(catalogName, data);
+                } catch (Exception e) {
+                    LOGGER.severe("Error processing catalog '" + catalogName + "': " + e.getMessage());
                 }
-                ModelPathUtil.set(m.getLocal(), "catalogInfo", catalogInfo);
             }
+            ModelPathUtil.set(m.getLocal(), "catalogInfo", catalogInfo);
         } catch (CMException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -136,8 +133,7 @@ public class NewsstandRenderController extends RenderControllerBase {
 
     }
 
-    public static Catalog getCatalogFromCache(final SynchronizedUpdateCache updateCache,
-                                              final String catalogName,
+    public static Catalog getCatalogFromCache(final String catalogName,
                                               final boolean checkUpdates) {
 
         Catalog catalog = null;
@@ -152,7 +148,7 @@ public class NewsstandRenderController extends RenderControllerBase {
             } else if (checkUpdates) {
                 final Catalog newCatalog = createClient().getCatalogIssues(catalogName);
                 if (newCatalog != null) {
-                    if (!catalog.getMd5().equals(catalog.getMd5())) {
+                    if (!newCatalog.getMd5().equals(catalog.getMd5())) {
                         catalogUtil.putCatalog(catalogName, newCatalog);
                         catalog = newCatalog;
                     }
