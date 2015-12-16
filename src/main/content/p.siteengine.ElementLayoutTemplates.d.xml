@@ -16,6 +16,15 @@
           </referredContent>
         </metadata>
       </entry>
+      <entry mode="modify" withMetadata="false">
+        <metadata>
+          <referredContent>
+            <contentid>
+              <externalid>com.atex.plugins.newsstand.SingleIssue</externalid>
+            </contentid>
+          </referredContent>
+        </metadata>
+      </entry>
     </contentlist>
   </content>
 </batch>

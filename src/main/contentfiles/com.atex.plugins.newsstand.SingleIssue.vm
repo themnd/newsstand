@@ -1,0 +1,31 @@
+#macro(showIssues $publication)
+  <li><b>$publication.name</b> $publication.issues.size();
+  #if ($publication.issues.size() > 0)
+    #set($issue  = $publication.issues.get(0))
+  #end
+  </li>
+#end
+<div>
+  <i>$issue.label $issue.releaseDate</i>
+    <div class="issueLink" data-catalog="$!catalog" data-issue="$!issue.issueCode">
+      <img src="/newsstandws/issue/$issue.issueCode/cover/360.jpg" >
+    </div>
+</div>
+<script>
+function openInNewWindow(url) {
+  var win = window.open(url, '_blank');
+  win.focus();
+}
+$('.issueLink').on('click', function(e) {
+  var div = $(e.currentTarget);
+  var catalog = div.attr('data-catalog');
+  var issue = div.attr('data-issue');
+  $.when(Atex.plugin.newsstand.login(catalog, issue))
+    .then(function(data) {
+      if (console.log) {
+        console.log('got url ' + data);
+      }
+      openInNewWindow(data);
+    });
+});
+</script>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template-definition version="1.0" xmlns="http://www.polopoly.com/polopoly/cm/app/xml">
+  <!--This file contains input template definitions -->
+  <input-template name="com.atex.plugins.newsstand.SingleIssue" label="com.atex.plugins.newsstand.SingleIssue">
+    <policy>com.atex.plugins.newsstand.SingleIssuePolicy</policy>
+    <editor>com.polopoly.cm.app.widget.OTopPolicyWidget</editor>
+    <viewer>com.polopoly.cm.app.widget.OTopPolicyWidget</viewer>
+
+    <editor contextName="orchid_TOCENTRY">com.polopoly.siteengine.standard.contentlist.OContentListEntryBasePolicyWidget</editor>
+    <viewer contextName="orchid_TOCENTRY">com.polopoly.siteengine.standard.contentlist.OContentListEntryBasePolicyWidget</viewer>
+    <type>LayoutElement</type>
+    <param name="renderTemplateIconInSelect">false</param>
+
+    <param name="ViewState_insert">false</param>
+    <param name="ViewState_refresh">true</param>
+    <param name="EditState_saveAndClose">true</param>
+    <param name="EditState_saveAndInsert">false</param>
+    <param name="EditState_saveAndFastInsert">false</param>
+    <param name="EditState_saveAndView">true</param>
+    <param name="EditState_saveAndEdit">false</param>
+    <param name="EditNewState_saveAndClose">false</param>
+    <param name="EditNewState_saveAndInsert">false</param>
+    <param name="EditNewState_saveAndFastInsert">true</param>
+    <param name="EditNewState_saveAndView">false</param>
+
+    <field name="catalog" input-template="p.TextInput" required="true" label="com.atex.plugins.newsstand.SingleIssue.catalog">
+    </field>
+
+    <field name="issue" input-template="p.TextInput" required="true" label="com.atex.plugins.newsstand.SingleIssue.issue">
+    </field>
+
+    <output-templates mode="www">
+      <id>com.atex.plugins.newsstand.SingleIssue.ot</id>
+    </output-templates>
+
+  </input-template>
+</template-definition>
