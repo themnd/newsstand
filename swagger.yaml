@@ -1,0 +1,408 @@
+# Example YAML to get you started quickly.
+# Be aware that YAML has indentation based scoping.
+# Code completion support is available so start typing for available options.
+swagger: '2.0'
+
+# This is your document metadata
+info:
+  version: "1.0.0"
+  title: "Newsstand"
+  contact:
+    email: mnova@atex.com
+
+# basePath prefixes all resource paths
+basePath: /newsstand
+
+# Describe your paths here
+paths:
+
+################################################################################
+#                                 Catalog Paths                                #
+################################################################################
+
+  /catalog/{name}:
+    # This is a HTTP operation
+    get:
+      description: |
+        Gets `Catalog` objects.
+      produces:
+        - application/json
+      # This is array of GET operation parameters:
+      parameters:
+        - name: name
+          in: path
+          description: Name of the catalog
+          required: true
+          type: string
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            title: Catalog
+            type: object
+            items:
+              $ref: '#/definitions/Catalog'
+        404:
+          description: Catalog not found
+
+  /catalog/{name}/publication:
+    # This is a HTTP operation
+    get:
+      description: |
+        Get a `Publication` object based on the issueId or issueCode.
+      produces:
+        - application/json
+      # This is array of GET operation parameters:
+      parameters:
+        - name: name
+          in: path
+          description: Name of the catalog
+          required: true
+          type: string
+        - name: issueId
+          in: query
+          description: id of an issue
+          type: string
+        - name: issueCode
+          in: query
+          description: code of an issue
+          type: string
+        - name: includeIssues
+          in: query
+          description: include issues in the `Publication` object, default is true.
+          type: boolean
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            title: Publication
+            type: object
+            items:
+              $ref: '#/definitions/Publication'
+        404:
+          description: Publication not found
+
+  /catalog/{name}/last-newspaper:
+    # This is a HTTP operation
+    get:
+      description: |
+        Get latest newspaper `Issue` object (it assumes that in the given catalog there is only one newspaper type).
+      produces:
+        - application/json
+      # This is array of GET operation parameters:
+      parameters:
+        - name: name
+          in: path
+          description: Name of the catalog
+          required: true
+          type: string
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            title: Issue
+            type: object
+            items:
+              $ref: '#/definitions/Issue'
+        404:
+          description: Publication not found
+
+################################################################################
+#                                 Publication Paths                            #
+################################################################################
+
+  /publication/{id}:
+    # This is a HTTP operation
+    get:
+      description: |
+        Gets `Publication` objects.
+      produces:
+        - application/json
+      # This is array of GET operation parameters:
+      parameters:
+        - name: id
+          in: path
+          description: id of the publication
+          required: true
+          type: string
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            title: Publication
+            type: object
+            items:
+              $ref: '#/definitions/Publication'
+        404:
+          description: Publication not found
+
+  /publication/{id}/issues:
+    # This is a HTTP operation
+    get:
+      description: |
+        Get a list of `Issue` objects in the given pubblication.
+      produces:
+        - application/json
+      # This is array of GET operation parameters:
+      parameters:
+        - name: id
+          in: path
+          description: id of the publication
+          required: true
+          type: string
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Issue'
+        404:
+          description: Publication not found
+
+################################################################################
+#                                 Issue Paths                                  #
+################################################################################
+
+  /issue/{issueCode}:
+    # This is a HTTP operation
+    get:
+      description: |
+        Gets `Issue` object based on the given issue.
+      produces:
+        - application/json
+      # This is array of GET operation parameters:
+      parameters:
+        - name: issueCode
+          in: path
+          description: code of the issue
+          required: true
+          type: string
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            title: Issue
+            type: object
+            items:
+              $ref: '#/definitions/Issue'
+        404:
+          description: Issue not found
+
+  /issue/{issueCode}/cover/{resolution}.jpg:
+    # This is a HTTP operation
+    get:
+      description: |
+        Get the cover at the given resolution.
+      produces:
+        - image/jpeg
+      # This is array of GET operation parameters:
+      parameters:
+        - name: issueCode
+          in: path
+          description: code of the issue
+          required: true
+          type: string
+        - name: resolution
+          in: path
+          description: image resolution
+          required: true
+          type: string
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: The binary image
+        400:
+          description: parameter `resolution` not a number or problems storing the cached image.
+        404:
+          description: Issue not found
+
+  /issue/{issueCode}/page/{page}.pdf:
+    # This is a HTTP operation
+    get:
+      description: |
+        Get the pdf of the given page.
+      produces:
+        - application/pdf
+      # This is array of GET operation parameters:
+      parameters:
+        - name: issueCode
+          in: path
+          description: code of the issue
+          required: true
+          type: string
+        - name: page
+          in: path
+          description: page number
+          required: true
+          type: string
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: The binary pdf
+        400:
+          description: parameter `page` not a number or problems storing the cached pdf.
+        404:
+          description: Issue not found
+
+  /issue/{issueCode}.pdf:
+    # This is a HTTP operation
+    get:
+      description: |
+        Get the pdf of the issue.
+      produces:
+        - application/pdf
+      # This is array of GET operation parameters:
+      parameters:
+        - name: issueCode
+          in: path
+          description: code of the issue
+          required: true
+          type: string
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: The binary pdf
+        400:
+          description: problems storing the cached pdf.
+        404:
+          description: Issue not found
+
+  /issue/{issueCode}/login:
+    # This is a HTTP operation
+    post:
+      description: |
+        Get the login url for the given issue.
+      produces:
+        - application/pdf
+      # This is array of GET operation parameters:
+      parameters:
+        - name: issueCode
+          in: path
+          description: code of the issue
+          required: true
+          type: string
+        - name: catalog
+          in: query
+          description: name of the catalog
+          type: string
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          schema:
+            type: string
+            description: authorization url with ticket
+        400:
+          description: catalog not valid or no valid authorization url for the issue.
+        404:
+          description: Issue not found
+
+################################################################################
+#                                 Definitions                                  #
+################################################################################
+definitions:
+  Catalog:
+    type: object
+    properties:
+      md5:
+        type: string
+        description: md5 of the catalog
+      path:
+        type: string
+        description: path of the catalog
+      publications:
+        type: array
+        description: list of publications
+        items:
+          $ref: '#/definitions/Publication'
+  Publication:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      publisher:
+        type: object
+        items:
+          $ref: '#/definitions/Publisher'
+      defaultLanguage:
+        type: string
+      issues:
+        type: array
+        description: list of issues
+        items:
+          $ref: '#/definitions/Issue'
+  Publisher:
+    type: object
+    properties:
+      id:
+        type: string
+        description: unique identifier
+      name:
+        type: string
+        description: name of the publisher
+  Issue:
+    type: object
+    properties:
+      id:
+        type: string
+      issueCode:
+        type: string
+      year:
+        type: string
+      label:
+        type: string
+      teaser:
+        type: string
+      sku:
+        type: string
+      language:
+        type: string
+      published:
+        type: boolean
+      free:
+        type: boolean
+      releaseDate:
+        type: string
+        format: date
+      releaseId:
+        type: string
+      releaseRank:
+        type: string
+      summary:
+        type: boolean
+      preview:
+        type: boolean
+      latestExport:
+        type: string
+        format: date
