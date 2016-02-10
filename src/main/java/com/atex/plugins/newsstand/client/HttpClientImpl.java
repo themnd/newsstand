@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
@@ -88,7 +89,7 @@ public class HttpClientImpl implements HttpClient {
 
     private int callService(final String url, final OutputStream outputStream) throws IOException
     {
-        LOGGER.info("calling url " + url);
+        log(Level.INFO, "calling url " + url);
 
         HttpEntity responseEntity = null;
 
@@ -105,12 +106,15 @@ public class HttpClientImpl implements HttpClient {
 
                 statusCode = response.getStatusLine().getStatusCode();
 
-                LOGGER.info("status code " + url + " (" + statusCode + ")");
+                log(Level.INFO, "status code " + url + " (" + statusCode + ")");
 
                 if (HttpStatus.SC_OK == statusCode) {
 
                     try {
                         final byte[] content = EntityUtils.toByteArray(responseEntity);
+
+                        log(Level.INFO, "completed " + url + " (" + (content != null ? content.length : 0) + " bytes)");
+
                         IOUtils.write(content, outputStream);
                     } finally {
                         IOUtils.closeQuietly(outputStream);
@@ -138,7 +142,7 @@ public class HttpClientImpl implements HttpClient {
     {
         final HttpParams httpParams = new BasicHttpParams();
 
-        LOGGER.fine("connectionTimeout: " + connectionTimeout + " - socketTimeout: " + socketTimeout);
+        log(Level.FINE, "connectionTimeout: " + connectionTimeout + " - socketTimeout: " + socketTimeout);
 
         // set http connection timeout
         HttpConnectionParams.setConnectionTimeout(httpParams, connectionTimeout);
@@ -148,7 +152,7 @@ public class HttpClientImpl implements HttpClient {
 
         if (!Strings.isNullOrEmpty(proxyHost)) {
 
-            LOGGER.fine("Setting proxy for this client " + proxyHost + ":" + proxyPort);
+            log(Level.FINE, "Setting proxy for this client " + proxyHost + ":" + proxyPort);
 
             final HttpHost proxy = new HttpHost(proxyHost, proxyPort);
             httpParams.setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
@@ -159,5 +163,9 @@ public class HttpClientImpl implements HttpClient {
 
     public org.apache.http.client.HttpClient getHttpclient() {
         return httpclient;
+    }
+
+    private void log(final Level level, final String msg) {
+        LOGGER.log(level, "[" + Thread.currentThread().getId() + "] " + msg);
     }
 }
