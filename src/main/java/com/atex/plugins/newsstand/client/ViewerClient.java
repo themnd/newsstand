@@ -15,4 +15,8 @@ public interface ViewerClient {
     AuthData login(final String catalog, final String issueCode) throws IOException;
 
     byte[] getIssueCover(final String issueCode, final int resolution) throws IOException;
+
+    byte[] getIssuePDFPage(final String issueCode, final int pageNumber) throws IOException;
+
+    byte[] getIssuePDF(final String issueCode) throws IOException;
 }

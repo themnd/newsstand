@@ -84,9 +84,54 @@ public class ViewerClientImpl implements ViewerClient {
         }
     }
 
+    @Override
+    public byte[] getIssuePDFPage(final String issueCode, final int pageNumber) throws IOException {
+
+        LOGGER.info("getIssuePDF for issue " + issueCode + " and page " + pageNumber);
+
+        final String url = createIssuePDFUrl(issueCode, pageNumber);
+
+        try (final ByteArrayOutputStream fos = new ByteArrayOutputStream()) {
+            httpCall(url, fos);
+            IOUtils.closeQuietly(fos);
+            return fos.toByteArray();
+        }
+    }
+
+    @Override
+    public byte[] getIssuePDF(final String issueCode) throws IOException {
+
+        LOGGER.info("getIssuePDF for issue " + issueCode);
+
+        final String url = createIssuePDFUrl(issueCode);
+
+        try (final ByteArrayOutputStream fos = new ByteArrayOutputStream()) {
+            httpCall(url, fos);
+            IOUtils.closeQuietly(fos);
+            return fos.toByteArray();
+        }
+    }
+
     Catalog parseCatalog(final File file) throws IOException {
         final CatalogParser parser = new CatalogParser(file);
         return parser.open();
+    }
+
+    String createIssuePDFUrl(final String issueCode, final int pageNumber) {
+        return String.format("%s/%s/issue/%s/page/%03d/pdf?%s",
+                checkNotNull(configuration.getHost()),
+                checkNotNull(configuration.getWsName()),
+                checkNotNull(issueCode),
+                checkNotNull(pageNumber),
+                getWSParameters());
+    }
+
+    String createIssuePDFUrl(final String issueCode) {
+        return String.format("%s/%s/issue/%s/pdf?%s",
+                checkNotNull(configuration.getHost()),
+                checkNotNull(configuration.getWsName()),
+                checkNotNull(issueCode),
+                getWSParameters());
     }
 
     String createIssueCoverUrl(final String issueCode, final int resolution) {

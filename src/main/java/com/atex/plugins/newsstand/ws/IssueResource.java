@@ -45,7 +45,7 @@ import com.polopoly.util.StringUtil;
 /**
  * Jersey resource for issues.
  */
-@Path("/issue/{issueCode}")
+@Path("/issue")
 public class IssueResource {
 
     private static final Logger LOGGER = Logger.getLogger(IssueResource.class.getName());
@@ -69,6 +69,7 @@ public class IssueResource {
     }
 
     @GET
+    @Path("{issueCode}")
     @Produces({ MediaType.APPLICATION_JSON })
     public Response getIssueDetail(@PathParam("issueCode") final String issueCode) {
         final Issue issue = getIssueFromCatalogs(issueCode);
@@ -80,7 +81,7 @@ public class IssueResource {
     }
 
     @GET
-    @Path("cover/{resolution}.jpg")
+    @Path("{issueCode}/cover/{resolution}.jpg")
     @Produces({ "image/jpeg" })
     public Response getCover(@PathParam("issueCode") final String issueCode,
                              @PathParam("resolution") final String resolution) {
@@ -102,6 +103,7 @@ public class IssueResource {
                     IOUtils.closeQuietly(bos);
                     cover = bos.toByteArray();
                 }
+                touch(coverFile);
             } else {
                 final ViewerClient vc = createViewerClient();
                 cover = vc.getIssueCover(issueCode, resx);
@@ -116,11 +118,86 @@ public class IssueResource {
         }
     }
 
+    @GET
+    @Path("{issueCode}/page/{page}.pdf")
+    @Produces({ "application/pdf" })
+    public Response getPDFPage(@PathParam("issueCode") final String issueCode,
+                               @PathParam("page") final String page) {
+
+        final Issue issue = getIssueFromCatalogs(issueCode);
+        if (issue == null) {
+            return Response.status(Status.NOT_FOUND).cacheControl(noCache()).build();
+        }
+
+        try {
+            final int pageNumber = Integer.parseInt(page);
+
+
+            final byte[] pdf;
+            final File cacheDir = getIssueCacheDir(issue);
+            final File pdfFile = new File(cacheDir, "page-" + pageNumber + ".pdf");
+            if (pdfFile.exists()) {
+                try (final ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+                    Files.copy(Paths.get(pdfFile.getAbsolutePath()), bos);
+                    IOUtils.closeQuietly(bos);
+                    pdf = bos.toByteArray();
+                }
+                touch(pdfFile);
+            } else {
+                final ViewerClient vc = createViewerClient();
+                pdf = vc.getIssuePDFPage(issueCode, pageNumber);
+
+                cacheDir.mkdirs();
+                com.atex.plugins.newsstand.util.FileUtils.createFile(pdf, pdfFile);
+            }
+            return Response.ok(pdf).cacheControl(doCache(MAX_AGE_5_MINUTES)).build();
+        } catch (NumberFormatException | IOException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            return Response.status(Status.BAD_REQUEST).cacheControl(noCache()).build();
+        }
+    }
+
+    @GET
+    @Path("{issueCode}.pdf")
+    @Produces({ "application/pdf" })
+    public Response getPDF(@PathParam("issueCode") final String issueCode) {
+
+        final Issue issue = getIssueFromCatalogs(issueCode);
+        if (issue == null) {
+            return Response.status(Status.NOT_FOUND).cacheControl(noCache()).build();
+        }
+
+        try {
+            final byte[] pdf;
+            final File cacheDir = getIssueCacheDir(issue);
+            final File pdfFile = new File(cacheDir, "issue.pdf");
+            if (pdfFile.exists()) {
+                try (final ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+                    Files.copy(Paths.get(pdfFile.getAbsolutePath()), bos);
+                    IOUtils.closeQuietly(bos);
+                    pdf = bos.toByteArray();
+                }
+                touch(pdfFile);
+            } else {
+                final ViewerClient vc = createViewerClient();
+                pdf = vc.getIssuePDF(issueCode);
+
+                cacheDir.mkdirs();
+                com.atex.plugins.newsstand.util.FileUtils.createFile(pdf, pdfFile);
+            }
+            return Response.ok(pdf).cacheControl(doCache(MAX_AGE_5_MINUTES)).build();
+            //response = response.header("Content-Disposition", "attachment; filename=" + pdfFile.getName());
+        } catch (NumberFormatException | IOException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            return Response.status(Status.BAD_REQUEST).cacheControl(noCache()).build();
+        }
+    }
+
     @POST
-    @Path("login")
+    @Path("{issueCode}/login")
     @Produces({ MediaType.TEXT_PLAIN })
     public Response getLoginUrl(@PathParam("issueCode") final String issueCode,
-                             @QueryParam("catalog") final String catalogName) {
+                                @QueryParam("catalog") final String catalogName) {
 
         Status status = Status.BAD_REQUEST;
 
@@ -144,6 +221,14 @@ public class IssueResource {
         }
 
         return Response.status(status).cacheControl(noCache()).build();
+    }
+
+    private void touch(final File file) {
+        try {
+            FileUtils.touch(file);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, e.getMessage());
+        }
     }
 
     private boolean validateCatalog(final String catalogName) {
