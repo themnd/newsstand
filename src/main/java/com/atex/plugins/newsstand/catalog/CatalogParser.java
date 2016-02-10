@@ -148,6 +148,7 @@ public class CatalogParser {
                 + "latest_export "
                 + "from issue "
                 + "where NOT(test) "
+                + "AND published=\"true\" "
                 + "order by release_date DESC");
         while (rs.next()) {
             final String id = Integer.toString(rs.getInt("id"));
@@ -165,17 +166,25 @@ public class CatalogParser {
             issue.setTeaser(rs.getString("teaser"));
             issue.setSku(rs.getString("sku"));
             issue.setLanguage(rs.getString("language"));
-            issue.setPublished(rs.getBoolean("published"));
-            issue.setFree(rs.getBoolean("free"));
+            issue.setPublished(getBoolean(rs, "published"));
+            issue.setFree(getBoolean(rs, "free"));
             issue.setReleaseDate(rs.getDate("release_date"));
             issue.setReleaseId(Integer.toString(rs.getInt("release_id")));
             issue.setReleaseRank(Integer.toString(rs.getInt("release_rank")));
-            issue.setSummary(rs.getBoolean("summary"));
-            issue.setPreview(rs.getBoolean("preview"));
+            issue.setSummary(getBoolean(rs, "summary"));
+            issue.setPreview(getBoolean(rs, "preview"));
             issue.setLatestExport(rs.getTimestamp("latest_export"));
             LOGGER.fine(issue.toString());
             publication.addIssue(issue);
         }
+    }
+
+    private boolean getBoolean(final ResultSet rs, final String columnName) throws SQLException {
+        final String value = rs.getString(columnName);
+        if (!Strings.isNullOrEmpty(value)) {
+            return Boolean.parseBoolean(value.trim().toLowerCase());
+        }
+        return false;
     }
 
     private String getJDBCURI() {
