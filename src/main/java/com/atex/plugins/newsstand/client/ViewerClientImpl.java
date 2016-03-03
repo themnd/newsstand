@@ -16,6 +16,7 @@ import com.atex.plugins.newsstand.catalog.CatalogParser;
 import com.atex.plugins.newsstand.catalog.data.Catalog;
 import com.atex.plugins.newsstand.client.data.AuthData;
 import com.google.gson.Gson;
+import com.polopoly.util.StringUtil;
 
 /**
  * Implementation for {@link ViewerClient}.
@@ -144,11 +145,11 @@ public class ViewerClientImpl implements ViewerClient {
     }
 
     String createCatalogIssuesUrl(final String catalog) {
-        return String.format("%s/%s/catalog/%s?%s",
+        return String.format("%s/%s/catalog/%s%s",
                 checkNotNull(configuration.getHost()),
                 checkNotNull(configuration.getWsName()),
                 checkNotNull(catalog),
-                getWSParameters());
+                getWSParametersV2());
     }
 
     String getWSParameters() {
@@ -158,12 +159,51 @@ public class ViewerClientImpl implements ViewerClient {
                 checkNotNull(configuration.getDeviceId()));
     }
 
+    String getWSParametersV2() {
+        return String.format("/%s/%s?device_id=%s",
+                checkNotNull(configuration.getPlatform()),
+                checkNotNull(configuration.getType()),
+                checkNotNull(configuration.getDeviceId()));
+    }
+
     String createLoginUrl(final String catalog, final String issueCode) {
         return String.format("%s/%s/s2s/auth/%s?content=%s",
-                checkNotNull(configuration.getHost()),
+                checkNotNull(getLoginHost(catalog)),
                 checkNotNull(configuration.getVersion()),
                 checkNotNull(catalog),
                 checkNotNull(issueCode));
+    }
+
+    /**
+     * In some cases we need to replace the original host with a custom host
+     * based on the given catalog.
+     *
+     * @return a not null host.
+     */
+    private String getLoginHost(final String catalog) {
+        if (useSfogliatoreWebHost()) {
+            switch (catalog) {
+                case "ASAR":
+                    return "http://sfogliatoreweb.larena.it";
+
+                case "ASBS":
+                    return "http://sfogliatoreweb.bresciaoggi.it";
+
+                case "ASVI":
+                    return "http://sfogliatoreweb.ilgiornaledivicenza.it";
+
+                default:
+                    return checkNotNull(configuration.getHost());
+            }
+        } else {
+            return checkNotNull(configuration.getHost());
+        }
+    }
+
+    private boolean useSfogliatoreWebHost() {
+
+        final String property = System.getProperty("useSfogliatoreWebHost", "false");
+        return StringUtil.equalsIgnoreCase(property, "true");
     }
 
     private String httpCall(final String url) throws IOException {

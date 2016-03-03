@@ -19,6 +19,8 @@ import com.polopoly.application.Application;
 import com.polopoly.application.servlet.ApplicationNameNotFoundException;
 import com.polopoly.application.servlet.ApplicationServletUtil;
 import com.polopoly.cm.ExternalContentId;
+import com.polopoly.cm.VersionInfo;
+import com.polopoly.cm.VersionedContentId;
 import com.polopoly.cm.client.CMException;
 import com.polopoly.cm.client.CmClient;
 import com.polopoly.cm.client.CmClientBase;
@@ -61,8 +63,35 @@ public class NewsstandContextListener implements javax.servlet.ServletContextLis
         final CmClient cmClient = (CmClient) application.getApplicationComponent(CmClientBase.DEFAULT_COMPOUND_NAME);
 
         final PolicyCMServer cmServer = cmClient.getPolicyCMServer();
-        final ConfigurationPolicy configurationPolicy = (ConfigurationPolicy) cmServer.getPolicy(
-                new ExternalContentId(ConfigurationPolicy.CONFIG_EXTERNAL_ID));
+
+        // in a local development environment, when you apply configuration changes
+        // it seems that the configuration policy returned by the CMServer is the
+        // oldest one, probably because the content cache has not been updated yet.
+        // So to force the retrieval of the latest committed, we will use the
+        // uncached call getVersionInfos which will return all the policy versions
+        // and we will use the first committed one.
+        //
+        // [mnova - 20160303]
+
+        final VersionedContentId contentId = cmServer.findContentIdByExternalId(new ExternalContentId(ConfigurationPolicy.CONFIG_EXTERNAL_ID));
+        final VersionInfo[] versionInfo = cmServer.getVersionInfos(contentId.getLatestVersionId());
+
+        ConfigurationPolicy configurationPolicy = null;
+        if (versionInfo != null) {
+            for (int idx = versionInfo.length - 1; idx >= 0; idx++) {
+                final VersionInfo vi = versionInfo[idx];
+                LOGGER.info(vi.toString());
+                if (vi.isCommitted()) {
+                    final VersionedContentId vid = new VersionedContentId(contentId, vi.getVersion());
+                    configurationPolicy = (ConfigurationPolicy) cmServer.getPolicy(vid);
+                    break;
+                }
+            }
+        }
+
+        if (configurationPolicy == null) {
+            configurationPolicy = (ConfigurationPolicy) cmServer.getPolicy(contentId);
+        }
 
         final ViewerClientConfiguration configuration = ViewerClientConfigurationFactory.from(configurationPolicy);
         ViewerClientFactory.initInstance(configuration);

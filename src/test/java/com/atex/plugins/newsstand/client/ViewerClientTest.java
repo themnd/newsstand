@@ -75,7 +75,7 @@ public class ViewerClientTest {
 
     @Test
     public void testCatalogParameters() throws IOException {
-        final String publisher = RandomStringUtils.randomAlphabetic(5);
+        final String publisher = "PUB" + RandomStringUtils.randomAlphabetic(5);
 
         final Catalog expected = new Catalog();
         Mockito.when(httpClient.doGet(Mockito.anyString())).thenReturn("");
@@ -89,13 +89,44 @@ public class ViewerClientTest {
         Mockito.verify(httpClient).doGet(captor.capture(), Mockito.any(OutputStream.class));
 
         final String url = captor.getValue();
-        System.out.println(url);
-        Assert.assertTrue(url.startsWith(config.getHost()));
-        Assert.assertFalse(url.contains(config.getVersion()));
-        Assert.assertTrue(url.contains(config.getWsName()));
-        Assert.assertTrue(url.contains(config.getPlatform()));
-        Assert.assertTrue(url.contains(config.getType()));
-        Assert.assertTrue(url.contains(config.getDeviceId()));
+        Assert.assertTrue(url, url.startsWith(config.getHost()));
+        Assert.assertFalse(url, url.contains(config.getVersion()));
+        Assert.assertTrue(url, url.contains(config.getWsName()));
+        Assert.assertTrue(url, url.contains(config.getPlatform()));
+        Assert.assertTrue(url, url.contains(config.getType()));
+        Assert.assertTrue(url, url.contains(config.getDeviceId()));
+        Assert.assertTrue(url, url.contains("/" + publisher + "/"));
+        Assert.assertTrue(url, url.contains("/" + config.getPlatform() + "/"));
+        Assert.assertTrue(url, url.contains("/" + config.getType() + "?"));
+        Assert.assertTrue(url, url.endsWith("?device_id=" + config.getDeviceId()));
+    }
+
+    @Test
+    public void testCoverParameters() throws IOException {
+        final String publisher = RandomStringUtils.randomAlphabetic(5);
+        final String isssueCode = RandomStringUtils.randomAlphabetic(15);
+
+        final Catalog expected = new Catalog();
+        Mockito.when(httpClient.doGet(Mockito.anyString())).thenReturn("");
+        Mockito.doReturn(expected).when(client).parseCatalog(Mockito.any(File.class));
+
+        client.getIssueCover(isssueCode, 100);
+
+        final ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(httpClient).doGet(captor.capture(), Mockito.any(OutputStream.class));
+
+        final String url = captor.getValue();
+        Assert.assertTrue(url, url.startsWith(config.getHost()));
+        Assert.assertFalse(url, url.contains(config.getVersion()));
+        Assert.assertTrue(url, url.contains(config.getWsName()));
+        Assert.assertTrue(url, url.contains(config.getPlatform()));
+        Assert.assertTrue(url, url.contains(config.getType()));
+        Assert.assertTrue(url, url.contains(config.getDeviceId()));
+        Assert.assertTrue(url, url.contains("/issue/" + isssueCode + "/"));
+        Assert.assertTrue(url, url.contains("/cover/" + 100 + "?"));
+        //Assert.assertTrue(url, url.contains("app_name=" + publisher));
+        Assert.assertTrue(url, url.contains("platform=" + config.getPlatform()));
+        Assert.assertTrue(url, url.endsWith("device_id=" + config.getDeviceId()));
     }
 
     /*
@@ -177,8 +208,8 @@ Giornale di Vicenza: ASVI_2015_test1
 
     private ViewerClientConfiguration getRealConfig() {
         ViewerClientConfiguration config = new ViewerClientConfiguration();
-        config.setHost("http://vp-pro12.xorovo.it");
-        config.setVersion("vpweb25");
+        config.setHost("https://d2pz6tzjwnvbvo.cloudfront.net");
+        config.setVersion("vpweb");
         config.setWsName("ViewerplusWS");
         config.setPlatform("web");
         config.setType("production");

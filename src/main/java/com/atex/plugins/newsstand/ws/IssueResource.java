@@ -53,6 +53,7 @@ public class IssueResource {
     public static final int MAX_AGE_5_MINUTES = 300;
     private static final String NEWSSTAND_CACHE_DIR = "newsstand.cacheDir";
     private static final String ISSUES_CACHE_DIR = "issues";
+    public static final int MAX_RESOLUTION = 600;
 
     @Context
     private CmClient cmClient;
@@ -92,7 +93,7 @@ public class IssueResource {
         }
 
         try {
-            final int resx = Integer.parseInt(resolution);
+            final int resx = Math.min(Integer.parseInt(resolution), MAX_RESOLUTION);
 
             final byte[] cover;
             final File cacheDir = getIssueCacheDir(issue);
