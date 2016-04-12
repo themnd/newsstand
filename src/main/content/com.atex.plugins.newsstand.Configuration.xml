@@ -37,12 +37,20 @@
           <field name="catalogs" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.catalogs">
           </field>
           <field name="newspapers" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.newspapers">
+            <param name="size">100</param>
+            <param name="maxlength">500</param>
           </field>
           <field name="magazines" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.magazines">
+            <param name="size">100</param>
+            <param name="maxlength">500</param>
           </field>
           <field name="seasonals" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.seasonals">
+            <param name="size">100</param>
+            <param name="maxlength">500</param>
           </field>
           <field name="specials" input-template="p.TextInput" label="com.atex.plugins.newsstand.Configuration.specials">
+            <param name="size">100</param>
+            <param name="maxlength">500</param>
           </field>
         </layout>
       </layout>
