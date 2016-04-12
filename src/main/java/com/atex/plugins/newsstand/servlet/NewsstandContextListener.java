@@ -76,20 +76,27 @@ public class NewsstandContextListener implements javax.servlet.ServletContextLis
         final VersionedContentId contentId = cmServer.findContentIdByExternalId(new ExternalContentId(ConfigurationPolicy.CONFIG_EXTERNAL_ID));
         final VersionInfo[] versionInfo = cmServer.getVersionInfos(contentId.getLatestVersionId());
 
+        LOGGER.info("loading configuration");
+
         ConfigurationPolicy configurationPolicy = null;
         if (versionInfo != null) {
-            for (int idx = versionInfo.length - 1; idx >= 0; idx++) {
+            for (int idx = versionInfo.length - 1; idx >= 0; idx--) {
                 final VersionInfo vi = versionInfo[idx];
                 LOGGER.info(vi.toString());
-                if (vi.isCommitted()) {
-                    final VersionedContentId vid = new VersionedContentId(contentId, vi.getVersion());
-                    configurationPolicy = (ConfigurationPolicy) cmServer.getPolicy(vid);
-                    break;
+                try {
+                    if (vi.isCommitted()) {
+                        final VersionedContentId vid = new VersionedContentId(contentId, vi.getVersion());
+                        configurationPolicy = (ConfigurationPolicy) cmServer.getPolicy(vid);
+                        break;
+                    }
+                } catch (CMException e) {
+                    LOGGER.log(Level.SEVERE, "Cannot load version " + vi.getVersion(), e);
                 }
             }
         }
 
         if (configurationPolicy == null) {
+            LOGGER.info("no configuration found, loading default one");
             configurationPolicy = (ConfigurationPolicy) cmServer.getPolicy(contentId);
         }
 
